@@ -146,14 +146,6 @@ export default function Index() {
             <p className="text-xs text-muted-foreground">Offline command center</p>
           </div>
         </div>
-        <a
-          href="https://shakespeare.diy"
-          target="_blank"
-          rel="noreferrer"
-          className="mt-4 inline-flex text-xs text-primary underline underline-offset-4"
-        >
-          Vibed with Shakespeare
-        </a>
       </div>
 
       <div className="space-y-2">
@@ -226,6 +218,17 @@ export default function Index() {
           </CardContent>
         </Card>
       )}
+
+      <div className="mt-auto pt-4 text-center">
+        <a
+          href="https://shakespeare.diy"
+          target="_blank"
+          rel="noreferrer"
+          className="text-[10px] uppercase tracking-widest text-muted-foreground/50 transition hover:text-primary"
+        >
+          Vibed with Shakespeare
+        </a>
+      </div>
     </div>
   );
 
