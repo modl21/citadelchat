@@ -38,8 +38,13 @@ export function SetupWizard({ onComplete }: SetupWizardProps) {
   const { theme, setTheme } = useTheme();
   const isDark = theme === 'dark';
 
+  const modelsToOffer = useMemo(
+    () => availableModels.filter(model => runtimeModelSupport[model.id] !== false),
+    [availableModels, runtimeModelSupport]
+  );
+
   const [selectedModelId, setSelectedModelId] = useState(
-    availableModels.find(model => model.recommended)?.id ?? availableModels[0]?.id ?? '',
+    modelsToOffer.find(model => model.recommended)?.id ?? modelsToOffer[0]?.id ?? '',
   );
   const [selectedPackIds, setSelectedPackIds] = useState<string[]>(
     KNOWLEDGE_PRESETS.find(preset => preset.id === 'starter')?.packIds ?? [],
@@ -51,8 +56,8 @@ export function SetupWizard({ onComplete }: SetupWizardProps) {
   const [error, setError] = useState<string | null>(null);
 
   const selectedModel = useMemo(
-    () => availableModels.find(model => model.id === selectedModelId),
-    [availableModels, selectedModelId],
+    () => modelsToOffer.find(model => model.id === selectedModelId),
+    [modelsToOffer, selectedModelId],
   );
 
   const compatibilityTone = runtimeCompatibility.status === 'supported'
@@ -266,7 +271,7 @@ export function SetupWizard({ onComplete }: SetupWizardProps) {
 
                     {benchmarkResult && (
                       <Badge variant="outline">
-                        Recommended: {availableModels.find(model => model.id === benchmarkResult.recommendedModelId)?.name ?? benchmarkResult.recommendedModelId}
+                        Recommended: {modelsToOffer.find(model => model.id === benchmarkResult.recommendedModelId)?.name ?? benchmarkResult.recommendedModelId}
                       </Badge>
                     )}
                   </div>
@@ -281,7 +286,7 @@ export function SetupWizard({ onComplete }: SetupWizardProps) {
                 </div>
 
                 <div className="grid gap-3 sm:grid-cols-2">
-                  {availableModels.map(model => {
+                  {modelsToOffer.map(model => {
                     const isSelected = model.id === selectedModelId;
                     const isCached = cachedModelStatus[model.id];
                     const isRuntimeSupported = runtimeModelSupport[model.id] ?? true;
