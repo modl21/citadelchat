@@ -246,9 +246,18 @@ export default function Index() {
                 </a>
                 <div>
                   <h1 className="text-lg font-semibold">{view === 'chat' ? 'Operations Chat' : view === 'library' ? 'Knowledge Library' : 'System Settings'}</h1>
-                  <p className="text-xs text-muted-foreground">
-                    {selectedModel ? `${selectedModel.name} · ${selectedModel.sizeLabel}` : 'No model selected'}
-                  </p>
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <p>{selectedModel ? `${selectedModel.name} · ${selectedModel.sizeLabel}` : 'No model selected'}</p>
+                    <span>•</span>
+                    <a
+                      href="https://odell.xyz"
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-primary underline-offset-4 hover:underline"
+                    >
+                      curated by ODELL
+                    </a>
+                  </div>
                 </div>
               </div>
 
