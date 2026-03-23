@@ -23,9 +23,14 @@ interface SetupWizardProps {
 export function SetupWizard({ onComplete }: SetupWizardProps) {
   const {
     availableModels,
+    benchmarkResult,
     cachedModelStatus,
     completeInitialSetup,
+    isBenchmarkRunning,
     loadProgress,
+    runtimeCompatibility,
+    runtimeModelSupport,
+    runOnboardingBenchmark,
     isLoadingEngine,
     hasWebGpu,
     isOnline,
@@ -41,12 +46,20 @@ export function SetupWizard({ onComplete }: SetupWizardProps) {
   );
   const [autoLoadModel, setAutoLoadModel] = useState(true);
   const [isInstalling, setIsInstalling] = useState(false);
+  const [isApplyingBenchmark, setIsApplyingBenchmark] = useState(false);
+  const [benchmarkError, setBenchmarkError] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const selectedModel = useMemo(
     () => availableModels.find(model => model.id === selectedModelId),
     [availableModels, selectedModelId],
   );
+
+  const compatibilityTone = runtimeCompatibility.status === 'supported'
+    ? 'border-primary/40'
+    : runtimeCompatibility.status === 'limited'
+      ? 'border-amber-500/40'
+      : 'border-destructive/40';
 
   const totalKnowledgeBytes = useMemo(
     () => KNOWLEDGE_PACKS
@@ -92,6 +105,21 @@ export function SetupWizard({ onComplete }: SetupWizardProps) {
       setError(message);
     } finally {
       setIsInstalling(false);
+    }
+  }
+
+  async function handleRunBenchmark() {
+    setBenchmarkError(null);
+    setIsApplyingBenchmark(true);
+
+    try {
+      const result = await runOnboardingBenchmark();
+      setSelectedModelId(result.recommendedModelId);
+    } catch (benchmarkRunError) {
+      const message = benchmarkRunError instanceof Error ? benchmarkRunError.message : 'Benchmark failed.';
+      setBenchmarkError(message);
+    } finally {
+      setIsApplyingBenchmark(false);
     }
   }
 
@@ -170,6 +198,19 @@ export function SetupWizard({ onComplete }: SetupWizardProps) {
           </div>
         </div>
 
+        <Alert className={`mb-4 ${compatibilityTone}`}>
+          <Cpu className="size-4" />
+          <AlertTitle>{runtimeCompatibility.headline}</AlertTitle>
+          <AlertDescription>
+            <p className="mb-2">{runtimeCompatibility.detail}</p>
+            <ul className="list-disc pl-5">
+              {runtimeCompatibility.recommendations.map((tip) => (
+                <li key={tip}>{tip}</li>
+              ))}
+            </ul>
+          </AlertDescription>
+        </Alert>
+
         {!hasWebGpu && (
           <Alert className="mb-6 border-destructive/40">
             <Cpu className="size-4" />
@@ -204,37 +245,77 @@ export function SetupWizard({ onComplete }: SetupWizardProps) {
                   Pick based on your device. Smaller models are faster; larger models give better answers.
                 </CardDescription>
               </CardHeader>
-              <CardContent className="grid gap-3 sm:grid-cols-2">
-                {availableModels.map(model => {
-                  const isSelected = model.id === selectedModelId;
-                  const isCached = cachedModelStatus[model.id];
-
-                  return (
-                    <button
-                      key={model.id}
+              <CardContent className="space-y-4">
+                <div className="rounded-xl border bg-background/70 p-3">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <Button
                       type="button"
-                      onClick={() => setSelectedModelId(model.id)}
-                      className={cn(
-                        'rounded-xl border p-4 text-left transition-all hover:border-primary/50 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
-                        isSelected && 'border-primary bg-primary/5 shadow-md glow-primary',
-                      )}
+                      variant="outline"
+                      size="sm"
+                      onClick={() => void handleRunBenchmark()}
+                      disabled={isBenchmarkRunning || isApplyingBenchmark || runtimeCompatibility.status === 'unsupported'}
                     >
-                      <div className="mb-2 flex items-center justify-between gap-2">
-                        <p className="font-semibold">{model.name}</p>
-                        <div className="flex items-center gap-2">
-                          {model.recommended && <Badge>Recommended</Badge>}
-                          {isCached && <Badge variant="secondary">Cached</Badge>}
+                      {isBenchmarkRunning || isApplyingBenchmark ? 'Benchmarking…' : 'Run device benchmark'}
+                    </Button>
+
+                    {benchmarkResult && (
+                      <Badge variant="secondary">
+                        Score {benchmarkResult.score} · {benchmarkResult.tier.toUpperCase()} tier
+                      </Badge>
+                    )}
+
+                    {benchmarkResult && (
+                      <Badge variant="outline">
+                        Recommended: {availableModels.find(model => model.id === benchmarkResult.recommendedModelId)?.name ?? benchmarkResult.recommendedModelId}
+                      </Badge>
+                    )}
+                  </div>
+                  {benchmarkResult && (
+                    <p className="mt-2 text-xs text-muted-foreground">
+                      CPU {benchmarkResult.cpuScore} · GPU {benchmarkResult.gpuScore}
+                    </p>
+                  )}
+                  {benchmarkError && (
+                    <p className="mt-2 text-xs text-destructive">{benchmarkError}</p>
+                  )}
+                </div>
+
+                <div className="grid gap-3 sm:grid-cols-2">
+                  {availableModels.map(model => {
+                    const isSelected = model.id === selectedModelId;
+                    const isCached = cachedModelStatus[model.id];
+                    const isRuntimeSupported = runtimeModelSupport[model.id] ?? true;
+
+                    return (
+                      <button
+                        key={model.id}
+                        type="button"
+                        onClick={() => setSelectedModelId(model.id)}
+                        disabled={!isRuntimeSupported}
+                        className={cn(
+                          'rounded-xl border p-4 text-left transition-all hover:border-primary/50 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                          isSelected && 'border-primary bg-primary/5 shadow-md glow-primary',
+                          !isRuntimeSupported && 'opacity-60 border-dashed',
+                        )}
+                      >
+                        <div className="mb-2 flex items-center justify-between gap-2">
+                          <p className="font-semibold">{model.name}</p>
+                          <div className="flex items-center gap-2">
+                            {model.recommended && <Badge>Recommended</Badge>}
+                            {isCached && <Badge variant="secondary">Cached</Badge>}
+                            {!isRuntimeSupported && <Badge variant="outline">Not in runtime list</Badge>}
+                          </div>
                         </div>
-                      </div>
-                      <p className="mb-3 text-sm text-muted-foreground">{model.description}</p>
-                      <div className="flex flex-wrap gap-2 text-xs">
-                        <Badge variant="outline">{model.sizeLabel}</Badge>
-                        <Badge variant="outline">Speed: {model.speed}</Badge>
-                        <Badge variant="outline">Quality: {model.quality}</Badge>
-                      </div>
-                    </button>
-                  );
-                })}
+                        <p className="mb-3 text-sm text-muted-foreground">{model.description}</p>
+                        <div className="flex flex-wrap gap-2 text-xs">
+                          <Badge variant="outline">{model.sizeLabel}</Badge>
+                          <Badge variant="outline">Speed: {model.speed}</Badge>
+                          <Badge variant="outline">Quality: {model.quality}</Badge>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
               </CardContent>
             </Card>
           </TabsContent>
@@ -347,7 +428,7 @@ export function SetupWizard({ onComplete }: SetupWizardProps) {
             <Button
               type="button"
               onClick={handleInstall}
-              disabled={!isOnline || isInstalling || isLoadingEngine || !selectedModelId}
+              disabled={!isOnline || isInstalling || isLoadingEngine || !selectedModelId || runtimeCompatibility.status === 'unsupported'}
               className="w-full sm:w-auto"
             >
               {isInstalling || isLoadingEngine ? (

@@ -28,6 +28,31 @@ export interface CitadelAppSettings {
   autoLoadModel: boolean;
 }
 
+export type BrowserKind = 'chrome' | 'edge' | 'firefox' | 'safari' | 'opera' | 'other';
+
+export interface RuntimeCompatibility {
+  browser: BrowserKind;
+  browserVersion: string | null;
+  status: 'supported' | 'limited' | 'unsupported';
+  webGpuSupported: boolean;
+  secureContext: boolean;
+  hardwareConcurrency: number | null;
+  deviceMemoryGB: number | null;
+  headline: string;
+  detail: string;
+  recommendations: string[];
+}
+
+export interface BenchmarkResult {
+  ranAt: number;
+  score: number;
+  cpuScore: number;
+  gpuScore: number;
+  tier: 'low' | 'medium' | 'high' | 'ultra';
+  recommendedModelId: string;
+  notes: string[];
+}
+
 export interface CitadelContextType {
   engine: MLCEngineInterface | null;
   isEngineReady: boolean;
@@ -38,15 +63,21 @@ export interface CitadelContextType {
 
   isOnline: boolean;
   hasWebGpu: boolean;
+  runtimeCompatibility: RuntimeCompatibility;
+
+  benchmarkResult: BenchmarkResult | null;
+  isBenchmarkRunning: boolean;
 
   appSettings: CitadelAppSettings;
   downloadedPackIds: string[];
 
   availableModels: ModelOption[];
   cachedModelStatus: Record<string, boolean>;
+  runtimeModelSupport: Record<string, boolean>;
 
   loadModel: (modelId: string) => Promise<void>;
   unloadModel: () => Promise<void>;
+  runOnboardingBenchmark: () => Promise<BenchmarkResult>;
 
   sendMessage: (input: {
     userMessage: string;

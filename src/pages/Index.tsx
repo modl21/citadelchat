@@ -89,6 +89,7 @@ export default function Index() {
     engineError,
     getStorageInfo,
     hasWebGpu,
+    runtimeCompatibility,
     isEngineReady,
     isLoadingEngine,
     isOnline,
@@ -209,6 +210,20 @@ export default function Index() {
       {engineError && (
         <Card className="border-destructive/40">
           <CardContent className="p-4 text-xs text-destructive">{engineError}</CardContent>
+        </Card>
+      )}
+
+      {runtimeCompatibility.status !== 'supported' && (
+        <Card className={cn('border-dashed', runtimeCompatibility.status === 'unsupported' ? 'border-destructive/40' : 'border-amber-500/40')}>
+          <CardContent className="space-y-2 p-4 text-xs">
+            <p className="font-semibold">{runtimeCompatibility.headline}</p>
+            <p className="text-muted-foreground">{runtimeCompatibility.detail}</p>
+            <ul className="list-disc pl-4 text-muted-foreground">
+              {runtimeCompatibility.recommendations.map((tip) => (
+                <li key={tip}>{tip}</li>
+              ))}
+            </ul>
+          </CardContent>
         </Card>
       )}
     </div>

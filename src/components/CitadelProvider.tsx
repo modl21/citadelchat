@@ -11,9 +11,12 @@ import {
 import {
   CitadelContext,
   type CitadelAppSettings,
+  type BenchmarkResult,
+  type BrowserKind,
   type CitadelContextType,
   type CitadelMessage,
   type LoadProgress,
+  type RuntimeCompatibility,
 } from '@/contexts/CitadelContext';
 import { MODEL_OPTIONS } from '@/lib/webllm-models';
 import { getKnowledgePackById } from '@/lib/knowledge-packs';
@@ -34,6 +37,7 @@ const SETTINGS_KEY = {
   selectedModelId: 'citadel.selectedModelId',
   setupComplete: 'citadel.setupComplete',
   autoLoadModel: 'citadel.autoLoadModel',
+  benchmarkResult: 'citadel.benchmarkResult',
 } as const;
 
 const DEFAULT_MODEL_ID = MODEL_OPTIONS.find(model => model.recommended)?.id ?? MODEL_OPTIONS[0].id;
@@ -57,6 +61,132 @@ function normalizeProgress(report: InitProgressReport): LoadProgress {
     progress: Number.isFinite(report.progress) ? Math.max(0, Math.min(1, report.progress)) : 0,
     text: report.text,
     timeElapsed: report.timeElapsed,
+  };
+}
+
+function detectBrowserInfo(userAgent: string): { browser: BrowserKind; version: string | null } {
+  const ua = userAgent.toLowerCase();
+
+  const edgeMatch = ua.match(/edg\/(\d+(?:\.\d+)?)/);
+  if (edgeMatch) return { browser: 'edge', version: edgeMatch[1] };
+
+  const operaMatch = ua.match(/opr\/(\d+(?:\.\d+)?)/);
+  if (operaMatch) return { browser: 'opera', version: operaMatch[1] };
+
+  const firefoxMatch = ua.match(/firefox\/(\d+(?:\.\d+)?)/);
+  if (firefoxMatch) return { browser: 'firefox', version: firefoxMatch[1] };
+
+  const chromeMatch = ua.match(/chrome\/(\d+(?:\.\d+)?)/);
+  if (chromeMatch) return { browser: 'chrome', version: chromeMatch[1] };
+
+  const safariMatch = ua.match(/version\/(\d+(?:\.\d+)?).*safari/);
+  if (safariMatch) return { browser: 'safari', version: safariMatch[1] };
+
+  return { browser: 'other', version: null };
+}
+
+function buildCompatibilitySnapshot(): RuntimeCompatibility {
+  if (typeof navigator === 'undefined' || typeof window === 'undefined') {
+    return {
+      browser: 'other',
+      browserVersion: null,
+      status: 'unsupported',
+      webGpuSupported: false,
+      secureContext: false,
+      hardwareConcurrency: null,
+      deviceMemoryGB: null,
+      headline: 'Browser runtime required',
+      detail: 'Citadel Chat local AI requires a browser environment.',
+      recommendations: ['Open the app in a modern desktop browser.'],
+    };
+  }
+
+  const { browser, version } = detectBrowserInfo(navigator.userAgent);
+  const webGpuSupported = 'gpu' in navigator;
+  const secureContext = window.isSecureContext;
+  const hardwareConcurrency = typeof navigator.hardwareConcurrency === 'number' ? navigator.hardwareConcurrency : null;
+  const nav = navigator as Navigator & { deviceMemory?: number };
+  const deviceMemoryGB = typeof nav.deviceMemory === 'number' ? nav.deviceMemory : null;
+
+  let status: RuntimeCompatibility['status'] = webGpuSupported && secureContext ? 'supported' : 'limited';
+  const recommendations: string[] = [];
+
+  if (!secureContext) {
+    status = 'unsupported';
+    recommendations.push('Use HTTPS or localhost. WebGPU is blocked on insecure contexts.');
+  }
+
+  if (!webGpuSupported) {
+    if (browser === 'firefox') {
+      status = 'limited';
+      recommendations.push('Firefox WebGPU support varies by platform/version. Prefer Chrome or Edge for best results.');
+    } else if (browser === 'safari') {
+      status = 'limited';
+      recommendations.push('On Safari, ensure latest macOS/iOS and enable WebGPU in advanced/experimental settings if needed.');
+    } else if (browser === 'chrome' || browser === 'edge' || browser === 'opera') {
+      status = 'limited';
+      recommendations.push('Update your browser to latest stable and ensure GPU acceleration is enabled.');
+    } else {
+      status = 'unsupported';
+      recommendations.push('Use a recent Chrome or Edge release for strongest WebLLM compatibility.');
+    }
+  } else {
+    recommendations.push('WebGPU detected. Local model inference should run in this browser.');
+  }
+
+  const headline =
+    status === 'supported'
+      ? 'Runtime compatible'
+      : status === 'limited'
+        ? 'Runtime partially supported'
+        : 'Runtime not supported';
+
+  const detail =
+    status === 'supported'
+      ? `${browser.toUpperCase()}${version ? ` ${version}` : ''} is ready for local inference.`
+      : `${browser.toUpperCase()}${version ? ` ${version}` : ''} may have limited WebLLM support on this device.`;
+
+  return {
+    browser,
+    browserVersion: version,
+    status,
+    webGpuSupported,
+    secureContext,
+    hardwareConcurrency,
+    deviceMemoryGB,
+    headline,
+    detail,
+    recommendations,
+  };
+}
+
+function chooseBenchmarkRecommendation(score: number, availableModels: string[]): { tier: BenchmarkResult['tier']; modelId: string } {
+  const has = (id: string) => availableModels.includes(id);
+
+  if (score >= 80) {
+    return {
+      tier: 'ultra',
+      modelId: has('Qwen3-4B-q4f16_1-MLC') ? 'Qwen3-4B-q4f16_1-MLC' : (has('Llama-3.2-3B-Instruct-q4f16_1-MLC') ? 'Llama-3.2-3B-Instruct-q4f16_1-MLC' : availableModels[0]),
+    };
+  }
+
+  if (score >= 60) {
+    return {
+      tier: 'high',
+      modelId: has('Qwen3-1.7B-q4f16_1-MLC') ? 'Qwen3-1.7B-q4f16_1-MLC' : (has('Qwen2.5-3B-Instruct-q4f16_1-MLC') ? 'Qwen2.5-3B-Instruct-q4f16_1-MLC' : availableModels[0]),
+    };
+  }
+
+  if (score >= 40) {
+    return {
+      tier: 'medium',
+      modelId: has('Llama-3.2-1B-Instruct-q4f16_1-MLC') ? 'Llama-3.2-1B-Instruct-q4f16_1-MLC' : (has('Qwen2.5-1.5B-Instruct-q4f16_1-MLC') ? 'Qwen2.5-1.5B-Instruct-q4f16_1-MLC' : availableModels[0]),
+    };
+  }
+
+  return {
+    tier: 'low',
+    modelId: has('SmolLM2-360M-Instruct-q4f16_1-MLC') ? 'SmolLM2-360M-Instruct-q4f16_1-MLC' : availableModels[0],
   };
 }
 
@@ -100,13 +230,13 @@ export function CitadelProvider({ children }: { children: ReactNode }) {
   const [appSettings, setAppSettings] = useState<CitadelAppSettings>(defaultSettings);
   const [downloadedPackIds, setDownloadedPackIds] = useState<string[]>([]);
   const [isOnline, setIsOnline] = useState(typeof navigator !== 'undefined' ? navigator.onLine : true);
-  const [hasWebGpu, setHasWebGpu] = useState<boolean>(() => {
-    if (typeof navigator === 'undefined') {
-      return false;
-    }
-
-    return 'gpu' in navigator || typeof WebAssembly !== 'undefined';
-  });
+  const [runtimeCompatibility, setRuntimeCompatibility] = useState<RuntimeCompatibility>(() => buildCompatibilitySnapshot());
+  const [hasWebGpu, setHasWebGpu] = useState<boolean>(() => buildCompatibilitySnapshot().webGpuSupported);
+  const [benchmarkResult, setBenchmarkResult] = useState<BenchmarkResult | null>(null);
+  const [isBenchmarkRunning, setIsBenchmarkRunning] = useState(false);
+  const [runtimeModelSupport, setRuntimeModelSupport] = useState<Record<string, boolean>>(() =>
+    Object.fromEntries(MODEL_OPTIONS.map(model => [model.id, true])),
+  );
 
   const engineRef = useRef<MLCEngineInterface | null>(null);
   const webllmRef = useRef<Awaited<ReturnType<typeof loadWebLLMModule>> | null>(null);
@@ -119,10 +249,11 @@ export function CitadelProvider({ children }: { children: ReactNode }) {
     let mounted = true;
 
     async function bootstrapSettings() {
-      const [selectedModelId, setupCompleteRaw, autoLoadRaw] = await Promise.all([
+      const [selectedModelId, setupCompleteRaw, autoLoadRaw, benchmarkRaw] = await Promise.all([
         getSetting(SETTINGS_KEY.selectedModelId),
         getSetting(SETTINGS_KEY.setupComplete),
         getSetting(SETTINGS_KEY.autoLoadModel),
+        getSetting(SETTINGS_KEY.benchmarkResult),
       ]);
 
       if (!mounted) {
@@ -134,6 +265,15 @@ export function CitadelProvider({ children }: { children: ReactNode }) {
         setupComplete: readBoolean(setupCompleteRaw, defaultSettings.setupComplete),
         autoLoadModel: readBoolean(autoLoadRaw, defaultSettings.autoLoadModel),
       });
+
+      if (benchmarkRaw) {
+        try {
+          const parsed = JSON.parse(benchmarkRaw) as BenchmarkResult;
+          setBenchmarkResult(parsed);
+        } catch {
+          setBenchmarkResult(null);
+        }
+      }
     }
 
     bootstrapSettings().catch(error => {
@@ -178,7 +318,35 @@ export function CitadelProvider({ children }: { children: ReactNode }) {
       return;
     }
 
-    setHasWebGpu('gpu' in navigator || typeof WebAssembly !== 'undefined');
+    const snapshot = buildCompatibilitySnapshot();
+    setRuntimeCompatibility(snapshot);
+    setHasWebGpu(snapshot.webGpuSupported);
+  }, []);
+
+  useEffect(() => {
+    let mounted = true;
+
+    getWebLLMModule()
+      .then((webllm) => {
+        webllmRef.current = webllm;
+        const modelAppConfig = createModelAppConfig(webllm.prebuiltAppConfig);
+        const supported = new Set(modelAppConfig.model_list.map(model => model.model_id));
+
+        if (mounted) {
+          setRuntimeModelSupport(
+            Object.fromEntries(MODEL_OPTIONS.map(model => [model.id, supported.has(model.id)])),
+          );
+        }
+      })
+      .catch(() => {
+        if (mounted) {
+          setRuntimeModelSupport(Object.fromEntries(MODEL_OPTIONS.map(model => [model.id, true])));
+        }
+      });
+
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   const loadModel = async (modelId: string): Promise<void> => {
@@ -315,6 +483,62 @@ export function CitadelProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const runOnboardingBenchmark = async (): Promise<BenchmarkResult> => {
+    if (typeof window === 'undefined' || typeof navigator === 'undefined') {
+      throw new Error('Benchmark requires browser runtime.');
+    }
+
+    setIsBenchmarkRunning(true);
+
+    try {
+      const start = performance.now();
+
+      let synthetic = 0;
+      for (let i = 0; i < 1_000_000; i += 1) {
+        synthetic += Math.sqrt(i % 1000);
+      }
+      const cpuMs = performance.now() - start;
+
+      const gpuAvailable = 'gpu' in navigator;
+      const gpuScore = gpuAvailable ? 40 : 12;
+      const cpuScore = Math.max(15, Math.min(70, Math.round(900 / Math.max(15, cpuMs))));
+      const memoryBonus = typeof (navigator as Navigator & { deviceMemory?: number }).deviceMemory === 'number'
+        ? Math.min(20, Math.round(((navigator as Navigator & { deviceMemory?: number }).deviceMemory ?? 0) * 2))
+        : 0;
+      const coresBonus = typeof navigator.hardwareConcurrency === 'number'
+        ? Math.min(15, Math.round(navigator.hardwareConcurrency / 2))
+        : 0;
+
+      const score = Math.max(5, Math.min(100, cpuScore + gpuScore + memoryBonus + coresBonus - (gpuAvailable ? 0 : 25)));
+      const supportedIds = MODEL_OPTIONS
+        .map(model => model.id)
+        .filter(id => runtimeModelSupport[id] ?? true);
+      const allowedIds = supportedIds.length > 0 ? supportedIds : MODEL_OPTIONS.map(model => model.id);
+      const recommendation = chooseBenchmarkRecommendation(score, allowedIds);
+
+      const result: BenchmarkResult = {
+        ranAt: Date.now(),
+        score,
+        cpuScore,
+        gpuScore,
+        tier: recommendation.tier,
+        recommendedModelId: recommendation.modelId,
+        notes: [
+          `CPU loop completed in ${cpuMs.toFixed(0)}ms`,
+          gpuAvailable ? 'WebGPU detected' : 'WebGPU not detected',
+          recommendation.tier === 'low' ? 'Recommend lightweight model for smooth experience.' : 'Device can handle stronger models.',
+        ],
+      };
+
+      setBenchmarkResult(result);
+      await saveSetting(SETTINGS_KEY.benchmarkResult, JSON.stringify(result));
+
+      return result;
+    } finally {
+      setIsBenchmarkRunning(false);
+    }
+  };
+
   const sendMessage = async (input: {
     userMessage: string;
     history: CitadelMessage[];
@@ -407,6 +631,8 @@ export function CitadelProvider({ children }: { children: ReactNode }) {
 
     setAppSettings(defaultSettings);
     setDownloadedPackIds([]);
+    setBenchmarkResult(null);
+    await saveSetting(SETTINGS_KEY.benchmarkResult, '');
     setEngineError(null);
   };
 
@@ -444,15 +670,21 @@ export function CitadelProvider({ children }: { children: ReactNode }) {
 
     isOnline,
     hasWebGpu,
+    runtimeCompatibility,
+
+    benchmarkResult,
+    isBenchmarkRunning,
 
     appSettings,
     downloadedPackIds,
 
     availableModels: MODEL_OPTIONS,
     cachedModelStatus: cachedModelStatuses.data ?? {},
+    runtimeModelSupport,
 
     loadModel,
     unloadModel,
+    runOnboardingBenchmark,
 
     sendMessage,
 
