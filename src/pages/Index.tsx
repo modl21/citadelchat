@@ -217,23 +217,27 @@ export default function Index() {
             href="https://citadelwire.com"
             target="_blank"
             rel="noreferrer"
-            className="inline-flex items-center gap-2 rounded-lg border border-transparent pr-2 transition hover:border-primary/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="inline-flex items-center rounded-lg border border-transparent p-1 transition hover:border-primary/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
             <img
               src="/citadel-logo.jpg"
               alt="Citadel"
               className="h-10 w-10 rounded-md object-contain"
             />
-            <span className="text-sm font-semibold">Citadel</span>
           </a>
 
           <a
             href="https://odell.xyz"
             target="_blank"
             rel="noreferrer"
-            className="text-xs text-primary underline-offset-4 hover:underline"
+            className="inline-flex items-center gap-2 rounded-lg border border-transparent px-2 py-1 text-xs text-primary underline-offset-4 transition hover:border-primary/30 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
-            curated by ODELL
+            <span>curated by ODELL</span>
+            <img
+              src="/odell-badge.jpg"
+              alt="ODELL"
+              className="h-6 w-6 rounded object-cover"
+            />
           </a>
         </div>
       </div>
