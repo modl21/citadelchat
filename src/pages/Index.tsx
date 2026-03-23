@@ -230,11 +230,26 @@ export default function Index() {
                 </Sheet>
               </div>
 
-              <div>
-                <h1 className="text-lg font-semibold">{view === 'chat' ? 'Operations Chat' : view === 'library' ? 'Knowledge Library' : 'System Settings'}</h1>
-                <p className="text-xs text-muted-foreground">
-                  {selectedModel ? `${selectedModel.name} · ${selectedModel.sizeLabel}` : 'No model selected'}
-                </p>
+              <div className="flex items-center gap-3">
+                <a
+                  href="https://citadelwire.com"
+                  target="_blank"
+                  rel="noreferrer"
+                  aria-label="Visit Citadel Wire"
+                  className="inline-flex items-center rounded-lg border border-transparent transition hover:border-primary/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                >
+                  <img
+                    src="/citadel-logo.png"
+                    alt="Citadel"
+                    className="h-10 w-10 rounded-md object-contain"
+                  />
+                </a>
+                <div>
+                  <h1 className="text-lg font-semibold">{view === 'chat' ? 'Operations Chat' : view === 'library' ? 'Knowledge Library' : 'System Settings'}</h1>
+                  <p className="text-xs text-muted-foreground">
+                    {selectedModel ? `${selectedModel.name} · ${selectedModel.sizeLabel}` : 'No model selected'}
+                  </p>
+                </div>
               </div>
 
               <DropdownMenu>
