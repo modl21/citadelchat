@@ -239,9 +239,9 @@ export default function Index() {
                   className="inline-flex items-center rounded-lg border border-transparent transition hover:border-primary/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 >
                   <img
-                    src="/citadel-logo.png"
+                    src="/citadel-logo.jpg"
                     alt="Citadel"
-                    className="h-10 w-10 rounded-md object-contain"
+                    className="h-12 w-12 rounded-md object-contain"
                   />
                 </a>
                 <div>
