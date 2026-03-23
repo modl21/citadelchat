@@ -58,6 +58,15 @@ export const MODEL_OPTIONS: ModelOption[] = [
     quality: 'good',
   },
   {
+    id: 'gemma-3n-e4b-it-q4f16_1-MLC',
+    name: 'Gemma 3n E4B',
+    description: 'Gemma 3n generation option with improved reasoning and multilingual quality.',
+    sizeLabel: '~3.0 GB',
+    sizeBytes: 3_000_000_000,
+    speed: 'slow',
+    quality: 'excellent',
+  },
+  {
     id: 'Llama-3.2-3B-Instruct-q4f16_1-MLC',
     name: 'Llama 3.2 3B',
     description: 'Higher-quality answers and better long-form responses. Requires more memory.',

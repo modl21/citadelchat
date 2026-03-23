@@ -204,6 +204,11 @@ export function CitadelProvider({ children }: { children: ReactNode }) {
       webllmRef.current = webllm;
       const modelAppConfig = createModelAppConfig(webllm.prebuiltAppConfig);
 
+      const modelExists = modelAppConfig.model_list.some((model) => model.model_id === modelId);
+      if (!modelExists) {
+        throw new Error(`Model ${modelId} is not available in the current WebLLM runtime. Please choose another model.`);
+      }
+
       const createdEngine = await webllm.CreateMLCEngine(modelId, {
         appConfig: modelAppConfig,
         initProgressCallback: (report) => {
