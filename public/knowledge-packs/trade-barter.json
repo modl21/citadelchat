@@ -1,0 +1,28 @@
+{
+  "id": "trade-barter",
+  "title": "Post-Collapse Economics & Security",
+  "version": "1.0.0",
+  "updatedAt": "2026-03-23",
+  "documents": [
+    {
+      "id": "barter-items",
+      "title": "High-Value Barter Items",
+      "content": "When fiat currency fails, functional value rules. Tier 1 Barter: Medical supplies (antibiotics, painkillers), water filters, salt (for preservation). Tier 2: Ammunition (standard calibers like 9mm, 5.56, .22LR, 12ga), seeds, batteries, lighters. Tier 3: Vices (alcohol, tobacco, coffee). Do not trade away your primary means of defense or survival."
+    },
+    {
+      "id": "trade-security",
+      "title": "Trade Security Protocol",
+      "content": "Never trade at your base camp or home (OPSEC). Establish a neutral, open location. Do not bring your entire supply. Implement overwatch: have hidden, armed community members watching the trade location. Never show desperation during negotiations."
+    },
+    {
+      "id": "community-defense",
+      "title": "Community Defense Architecture",
+      "content": "A lone wolf eventually sleeps. You must form a community. Establish layers of security: 1) Early Warning (dogs, trip flares, scouts). 2) Obstacles (felled trees, barricades, funneling terrain). 3) Hardened cover (sandbags, reinforced walls). Implement a 24/7 watch rotation. Share resources to prevent internal friction."
+    },
+    {
+      "id": "grey-man",
+      "title": "The 'Grey Man' Concept",
+      "content": "Blend into the baseline environment. Do not wear tactical gear in an urban refugee setting. Do not appear well-fed or overly clean when everyone else is starving and filthy. Carry your gear in nondescript bags. Speak quietly, break eye contact, and appear entirely unremarkable to avoid drawing the attention of predators or desperate crowds."
+    }
+  ]
+}

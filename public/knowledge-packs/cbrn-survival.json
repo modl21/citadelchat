@@ -1,0 +1,33 @@
+{
+  "id": "chemical-biological-radiological",
+  "title": "CBRN Survival",
+  "version": "1.0.0",
+  "updatedAt": "2026-03-23",
+  "documents": [
+    {
+      "id": "radiation-protection",
+      "title": "Radiation: Time, Distance, Shielding",
+      "content": "Minimize TIME exposed. Maximize DISTANCE from the source. Maximize SHIELDING (thick concrete, packed earth, deep water). In a fallout event, shelter in the center-most room of the lowest floor (preferably basement). Do not exit for at least 48 to 72 hours (the 'Rule of Sevens' dictates a tenfold decrease in radiation every sevenfold increase in time)."
+    },
+    {
+      "id": "fallout-decontamination",
+      "title": "Fallout Decontamination",
+      "content": "If caught outside, remove outer clothing before entering a clean shelter (removes 90% of radioactive dust). Wash hair and body with soap and running water. DO NOT use hair conditioner—it binds radioactive particles to the hair. Bag and distance contaminated clothing."
+    },
+    {
+      "id": "potassium-iodide",
+      "title": "Potassium Iodide (KI) Usage",
+      "content": "KI only prevents the thyroid from absorbing radioactive iodine (I-131). It does NOT protect against general radiation or other isotopes. Take only when explicitly instructed or immediately following an event involving nuclear power or fallout. Dosage must follow strict local guidelines to avoid severe side effects."
+    },
+    {
+      "id": "biological-isolation",
+      "title": "Biological Threat Isolation",
+      "content": "Create a 'clean room' with plastic sheeting and duct tape over doors and vents. Maintain positive air pressure if possible. Use an N95 or better respirator mask if moving through contaminated zones. Disinfect returning equipment with a 1:10 bleach-to-water solution with a contact time of 10-15 minutes."
+    },
+    {
+      "id": "chemical-indicators",
+      "title": "Chemical Threat Indicators",
+      "content": "Look for unexplained mass casualties, dead wildlife/birds in unusual numbers, unusual liquid droplets, strange odors (garlic, newly mown hay, bitter almonds), or low-lying clouds/fog. Move upwind and to higher ground immediately, as most dangerous chemical agents are heavier than air and settle in valleys or basements."
+    }
+  ]
+}

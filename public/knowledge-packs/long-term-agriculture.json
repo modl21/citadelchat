@@ -1,0 +1,38 @@
+{
+  "id": "long-term-agriculture",
+  "title": "Agriculture and Ecosystems",
+  "version": "1.0.0",
+  "updatedAt": "2026-03-23",
+  "documents": [
+    {
+      "id": "seed-saving",
+      "title": "Seed Saving and Storage",
+      "content": "Only heirloom (open-pollinated) seeds breed true. Hybrids will revert to unpredictable traits. Allow fruiting vegetables (tomatoes, cucumbers) to over-ripen on the vine, extract seeds, ferment in water for 3 days to remove germination-inhibiting gel, then rinse and dry thoroughly. Store all seeds in a cool, dark, dry place (glass jars with desiccant)."
+    },
+    {
+      "id": "composting-humanure",
+      "title": "Composting and Humanure",
+      "content": "Maintain a carbon-to-nitrogen ratio of 30:1. Carbon (browns): dried leaves, straw, sawdust. Nitrogen (greens): food scraps, fresh grass, manure. Turn regularly to aerate and maintain aerobic decomposition. Human waste (humanure) MUST be composted separately in a specialized bin, reaching 122°F (50°C) for a week to kill pathogens, and must cure for a minimum of 1 full year before use on non-root food crops."
+    },
+    {
+      "id": "crop-rotation",
+      "title": "Crop Rotation and Guilds",
+      "content": "Never plant the same crop family in the same soil two years in a row to prevent pest buildup and soil depletion. Use the 'Three Sisters' guild: Corn provides a stalk for Beans to climb, Beans fix nitrogen into the soil, and Squash provides ground cover to retain moisture and deter weeds."
+    },
+    {
+      "id": "root-cellars",
+      "title": "Root Cellars and Winter Storage",
+      "content": "Root cellars preserve harvests without electricity. Ideal conditions are 32-40°F (0-4°C) with 85-95% humidity. Dig below the frost line. Provide intake ventilation low to the ground and exhaust ventilation near the ceiling. Store apples away from potatoes to prevent ethylene gas spoilage. Pack carrots and beets in damp sand or sawdust."
+    },
+    {
+      "id": "animal-husbandry",
+      "title": "Small Animal Husbandry",
+      "content": "Chickens: Provide extreme value through eggs, pest control, and manure; require high calcium and grit. Rabbits: Highest feed-to-meat conversion ratio; feed on forage and grass, breed rapidly, but meat is excessively lean (beware 'rabbit starvation' or protein poisoning without added fats). Goats: Excellent foragers for brush clearing, provide milk and meat, but require extremely robust fencing."
+    },
+    {
+      "id": "foraging-rules",
+      "title": "Wild Foraging Rules",
+      "content": "Never consume an unidentified plant. Follow the Universal Edibility Test ONLY in absolute desperation: separate plant into parts (root, stem, leaf), smell for almonds/peaches (cyanide), rub on wrist (wait 15 mins), rub on lip (wait 15 mins), chew small piece and hold in mouth (15 mins), swallow and wait 8 hours. If any burning, itching, or nausea occurs, discard immediately."
+    }
+  ]
+}
