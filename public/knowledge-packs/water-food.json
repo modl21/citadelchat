@@ -1,0 +1,43 @@
+{
+  "id": "water-food",
+  "title": "Water, Food, and Sanitation",
+  "version": "1.0.0",
+  "updatedAt": "2026-03-23",
+  "documents": [
+    {
+      "id": "water-priority",
+      "title": "Water Security Priorities",
+      "content": "Prioritize safe water before food production. Plan daily minimums per person for drinking, cooking, and hygiene. Separate raw source water containers from purified water containers. Rotate storage and label fill dates."
+    },
+    {
+      "id": "purification-methods",
+      "title": "Field Water Purification",
+      "content": "Use multi-barrier treatment: pre-filter debris, then disinfect. Boiling: rolling boil for one minute (three minutes at higher elevation). Chemical treatment: use correct concentration and contact time. Filtration: use certified microfilters and follow manufacturer flow and backflush procedure. Store purified water in sanitized containers with narrow openings."
+    },
+    {
+      "id": "rationing-plan",
+      "title": "Food Ration Planning",
+      "content": "Plan calories by workload tier: light, moderate, heavy. Maintain macro balance and micronutrient sources to avoid deficiency under long stress periods. Use first-expire-first-out stock rotation. Keep 7-day quick-access rations and 30+ day reserve."
+    },
+    {
+      "id": "preservation-basics",
+      "title": "Food Preservation Basics",
+      "content": "Drying, salting, fermenting, and canning extend shelf life. Control moisture and temperature to reduce spoilage. Label all preserved batches with date and method. Discard containers with swelling, leakage, off-smell, or mold growth."
+    },
+    {
+      "id": "latrine-setup",
+      "title": "Latrine and Waste Layout",
+      "content": "Place latrine downhill and away from water sources and food areas. Create handwash station at entry/exit. Cover waste with soil after each use. Establish clear cleaning schedule and disinfect contact surfaces daily."
+    },
+    {
+      "id": "outbreak-response",
+      "title": "Gastrointestinal Outbreak Response",
+      "content": "Immediately isolate symptomatic individuals, intensify hand hygiene, and switch to boiled/disinfected water only. Enforce separate utensils and sleeping areas. Track symptoms and hydration status. Escalate evacuation if severe dehydration or blood in stool occurs."
+    },
+    {
+      "id": "fuel-cooking",
+      "title": "Fuel-Efficient Cooking",
+      "content": "Use covered pots, retained-heat cooking, and batch meal prep to conserve fuel. Prioritize foods with shorter cook times during fuel scarcity. Maintain ventilation for indoor stoves to reduce carbon monoxide risk."
+    }
+  ]
+}

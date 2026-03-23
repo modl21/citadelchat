@@ -1,0 +1,43 @@
+{
+  "id": "comms-navigation",
+  "title": "Communications and Navigation",
+  "version": "1.0.0",
+  "updatedAt": "2026-03-23",
+  "documents": [
+    {
+      "id": "radio-discipline",
+      "title": "Radio Discipline Fundamentals",
+      "content": "Keep transmissions short, structured, and purposeful. Use agreed call signs and authentication words. Confirm critical details by read-back. Avoid unnecessary chatter. Schedule radio checks and fallback windows."
+    },
+    {
+      "id": "message-format",
+      "title": "Standard Message Format",
+      "content": "Use concise sequence: Who you are calling, who you are, priority, location, request, and acknowledgment needed. Repeat coordinates carefully. For emergency traffic, mark as immediate and maintain channel clear until resolved."
+    },
+    {
+      "id": "signal-plans",
+      "title": "Low-Tech Signal Plans",
+      "content": "Prepare non-electronic alternatives: visual markers, whistle codes, timed checkpoints, and paper route cards. Predefine meaning of each signal and keep plans simple enough for stress conditions."
+    },
+    {
+      "id": "map-grid",
+      "title": "Map and Grid Reference Basics",
+      "content": "Always orient map to terrain before route decisions. Use grid references consistently with local map standard. Confirm distance and elevation gain estimates. Mark water, shelter, and hazard points before movement."
+    },
+    {
+      "id": "compass-nav",
+      "title": "Compass Navigation Procedure",
+      "content": "Set bearing, identify terrain handrails, and move by short legs with regular backstops. Record pace count for terrain type. Reconfirm position at known landmarks instead of drifting long distances."
+    },
+    {
+      "id": "night-movement",
+      "title": "Night Movement and Light Discipline",
+      "content": "Reduce silhouette and noise signatures. Use red light only when necessary and shield beams. Keep interval spacing and periodic accountability halts. Avoid crossing exposed terrain unless timing and concealment are favorable."
+    },
+    {
+      "id": "comms-resilience",
+      "title": "Comms Resilience Planning",
+      "content": "Plan layered comms: primary radio, secondary frequency, tertiary runner/signals. Maintain spare power budget and spare antennas/connectors. Drill failure scenarios monthly to keep procedures automatic."
+    }
+  ]
+}

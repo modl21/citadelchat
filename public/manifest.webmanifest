@@ -1,0 +1,11 @@
+{
+  "name": "Citadel Chat",
+  "short_name": "Citadel",
+  "description": "Offline-first local AI command center with downloadable knowledge packs.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#0f131d",
+  "theme_color": "#22b573",
+  "icons": []
+}

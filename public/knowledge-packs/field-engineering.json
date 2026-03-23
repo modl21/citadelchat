@@ -1,0 +1,48 @@
+{
+  "id": "field-engineering",
+  "title": "Field Engineering and Power",
+  "version": "1.0.0",
+  "updatedAt": "2026-03-23",
+  "documents": [
+    {
+      "id": "shelter-priorities",
+      "title": "Shelter Priorities",
+      "content": "Order of shelter needs: weatherproofing, insulation, ventilation, drainage, and security. Build with local materials plus modular repair kits. Elevate sleeping platforms where ground moisture is high."
+    },
+    {
+      "id": "power-budget",
+      "title": "Power Budget and Load Tiers",
+      "content": "Classify loads as critical, important, and optional. Protect critical loads with dedicated battery reserve. Track daily generation and consumption. Enforce automatic load shedding when reserves cross minimum threshold."
+    },
+    {
+      "id": "battery-safety",
+      "title": "Battery Safety and Maintenance",
+      "content": "Use proper charge profiles and avoid deep discharge cycles when possible. Keep batteries within safe temperature range. Isolate damaged packs immediately. Store firefighting materials appropriate for battery chemistry."
+    },
+    {
+      "id": "solar-setup",
+      "title": "Field Solar Setup",
+      "content": "Orient panels for peak daily exposure and avoid partial shading. Use correct cable gauge and fuse protection near source and load. Secure panel mounts against wind uplift. Clean panel surfaces regularly for efficiency."
+    },
+    {
+      "id": "water-pump-basics",
+      "title": "Water Pump and Plumbing Basics",
+      "content": "Install intake screens, check valves, and pressure relief where needed. Keep spare seals, impellers, and hose clamps. Winterize lines in freezing conditions. Label shutoff points clearly for rapid response."
+    },
+    {
+      "id": "repair-workflow",
+      "title": "Rapid Repair Workflow",
+      "content": "Diagnose by symptom, isolate subsystem, test one change at a time, and document fix. Keep standard tool rolls staged by domain: electrical, mechanical, and structural. Use fault logs to identify recurring failures."
+    },
+    {
+      "id": "defensive-design",
+      "title": "Defensive Site Design",
+      "content": "Use layered perimeter indicators, controlled access points, and passive observation positions. Preserve clear emergency egress routes. Balance concealment and visibility depending on local risk profile."
+    },
+    {
+      "id": "spares-management",
+      "title": "Spare Parts Management",
+      "content": "Track failure-prone components and keep minimum stock by mission criticality. Label bins with compatibility and installation notes. Rotate elastomers and adhesives before shelf-life loss."
+    }
+  ]
+}

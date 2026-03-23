@@ -38,3 +38,11 @@ global.ResizeObserver = vi.fn().mockImplementation((_callback) => ({
   unobserve: vi.fn(),
   disconnect: vi.fn(),
 }));
+
+// Mock WebGPU capability check
+if (!('gpu' in navigator)) {
+  Object.defineProperty(navigator, 'gpu', {
+    value: {},
+    writable: true,
+  });
+}

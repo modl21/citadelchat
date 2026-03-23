@@ -1,0 +1,48 @@
+{
+  "id": "emergency-medical",
+  "title": "Emergency Medical Field Guide",
+  "version": "1.0.0",
+  "updatedAt": "2026-03-23",
+  "documents": [
+    {
+      "id": "triage-priorities",
+      "title": "Rapid Triage Priorities",
+      "content": "Use a simple triage sequence: 1) Massive bleeding, 2) Airway, 3) Breathing, 4) Circulation, 5) Mental status, 6) Exposure and temperature control. Tag urgent red when immediate intervention can preserve life. Tag yellow when stable but requiring care. Tag green for ambulatory/minor injuries. Tag black when no signs of life and no available life-saving capacity. Reassess continuously after interventions."
+    },
+    {
+      "id": "bleeding-control",
+      "title": "Bleeding Control Protocol",
+      "content": "Apply direct pressure first with clean cloth or dressing. If severe extremity hemorrhage continues, apply a tourniquet high and tight above wound, record time, and do not remove in field unless directed by qualified medical command. For junctional bleeding, use wound packing with hemostatic dressing if available and maintain firm pressure for at least three minutes. Prevent shock by laying casualty flat, keeping warm, and minimizing movement."
+    },
+    {
+      "id": "airway-management",
+      "title": "Basic Airway Management",
+      "content": "If unresponsive and breathing normally, place casualty in recovery position. Open airway with head-tilt/chin-lift unless cervical injury suspected; if trauma suspected use jaw thrust. Clear visible obstruction only if easily reachable. Monitor breathing rate and effort every few minutes. Prepare for assisted ventilation only if trained and equipment is available."
+    },
+    {
+      "id": "infection-control",
+      "title": "Infection Prevention in Austere Settings",
+      "content": "Hand hygiene, clean water, and sterile technique reduce preventable deaths. Wash or sanitize hands before and after every contact. Use gloves when handling blood or body fluids. Disinfect reusable tools by washing, then boiling for at least 20 minutes where possible. Isolate symptomatic individuals with fever, cough, vomiting, or diarrhea from food preparation and sleeping areas."
+    },
+    {
+      "id": "fracture-stabilization",
+      "title": "Fracture and Sprain Stabilization",
+      "content": "Immobilize joint above and below suspected fracture. Check pulse, sensation, and movement before and after splinting. Do not force realignment in the field unless no distal pulse and evacuation delay is severe. Use padded rigid support and secure with bandage without restricting circulation. Elevate and cool soft tissue injuries when feasible."
+    },
+    {
+      "id": "burn-care",
+      "title": "Burn Assessment and Care",
+      "content": "Stop burning process first. Cool thermal burns with clean, cool (not ice-cold) water for up to 20 minutes if within first three hours of injury. Remove rings and constricting items. Cover with sterile non-adherent dressing. Do not break blisters or apply grease. Prioritize airway monitoring for facial burns or inhalation exposure. Begin fluid support and urgent evacuation for large burns."
+    },
+    {
+      "id": "medical-cache",
+      "title": "Medical Cache Organization",
+      "content": "Organize supplies by function: bleeding, airway, medications, diagnostics, sanitation, and evacuation. Label bins with expiration windows and reorder thresholds. Keep a field-ready trauma module separate from long-term stock. Protect medications from heat, moisture, and sunlight. Conduct monthly inventory and drill access under low-light conditions."
+    },
+    {
+      "id": "evacuation-handoff",
+      "title": "Casualty Evacuation Handoff Format",
+      "content": "Use concise handoff: Mechanism of injury, Injuries found, Signs/vitals trend, Treatment given, Allergies/medications/history, Time of critical events. Include tourniquet time, fluids administered, and response to interventions. Keep written card attached to patient when possible."
+    }
+  ]
+}
