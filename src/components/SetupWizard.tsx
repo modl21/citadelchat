@@ -1,7 +1,8 @@
 import { useMemo, useState } from 'react';
-import { Cpu, HardDriveDownload, Layers, ShieldCheck, Sparkles } from 'lucide-react';
+import { Cpu, HardDriveDownload, Layers, Moon, ShieldCheck, Sparkles, Sun } from 'lucide-react';
 
 import { useCitadel } from '@/contexts/CitadelContext';
+import { useTheme } from '@/hooks/useTheme';
 import { KNOWLEDGE_PACKS, KNOWLEDGE_PRESETS } from '@/lib/knowledge-packs';
 import { formatBytes } from '@/lib/webllm-models';
 import { Button } from '@/components/ui/button';
@@ -29,6 +30,8 @@ export function SetupWizard({ onComplete }: SetupWizardProps) {
     hasWebGpu,
     isOnline,
   } = useCitadel();
+  const { theme, setTheme } = useTheme();
+  const isDark = theme === 'dark';
 
   const [selectedModelId, setSelectedModelId] = useState(
     availableModels.find(model => model.recommended)?.id ?? availableModels[0]?.id ?? '',
@@ -95,7 +98,7 @@ export function SetupWizard({ onComplete }: SetupWizardProps) {
   return (
     <div className="min-h-screen bg-gradient-to-b from-background via-background to-muted/20 p-4 sm:p-8">
       <div className="mx-auto max-w-5xl animate-fade-in-up">
-        <div className="mb-4 flex items-center justify-between gap-3 rounded-xl border bg-card/80 px-4 py-2 backdrop-blur">
+        <div className="mb-4 grid grid-cols-[auto_1fr_auto] items-center gap-3 rounded-xl border bg-card/80 px-4 py-2 backdrop-blur">
           <a
             href="https://citadelwire.com"
             target="_blank"
@@ -108,6 +111,20 @@ export function SetupWizard({ onComplete }: SetupWizardProps) {
               className="h-9 w-9 rounded-md object-contain"
             />
           </a>
+
+          <div className="justify-self-center">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => setTheme(isDark ? 'light' : 'dark')}
+              aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+              className="inline-flex items-center gap-2"
+            >
+              {isDark ? <Sun className="size-4" /> : <Moon className="size-4" />}
+              <span>{isDark ? 'Light mode' : 'Dark mode'}</span>
+            </Button>
+          </div>
 
           <a
             href="https://odell.xyz"

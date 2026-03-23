@@ -5,9 +5,11 @@ import {
   HardDrive,
   Menu,
   MessageSquare,
+  Moon,
   PlugZap,
   Send,
   Settings,
+  Sun,
   Wifi,
   WifiOff,
 } from 'lucide-react';
@@ -16,6 +18,7 @@ import type { ComponentType, ReactNode } from 'react';
 import { useSeoMeta } from '@unhead/react';
 
 import { useCitadel, type CitadelMessage } from '@/contexts/CitadelContext';
+import { useTheme } from '@/hooks/useTheme';
 import { SetupWizard } from '@/components/SetupWizard';
 import { KNOWLEDGE_PACKS } from '@/lib/knowledge-packs';
 import { formatBytes } from '@/lib/webllm-models';
@@ -96,6 +99,8 @@ export default function Index() {
     saveSettings,
     sendMessage,
   } = useCitadel();
+  const { theme, setTheme } = useTheme();
+  const isDark = theme === 'dark';
 
   const [setupCompletedState, setSetupCompletedState] = useState(appSettings.setupComplete);
 
@@ -212,7 +217,7 @@ export default function Index() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-background via-background to-muted/20">
       <div className="border-b bg-card/80 px-4 py-2 backdrop-blur sm:px-6">
-        <div className="mx-auto flex w-full max-w-[1600px] items-center justify-between gap-3">
+        <div className="mx-auto grid w-full max-w-[1600px] grid-cols-[auto_1fr_auto] items-center gap-3">
           <a
             href="https://citadelwire.com"
             target="_blank"
@@ -225,6 +230,20 @@ export default function Index() {
               className="h-10 w-10 rounded-md object-contain"
             />
           </a>
+
+          <div className="justify-self-center">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => setTheme(isDark ? 'light' : 'dark')}
+              aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+              className="inline-flex items-center gap-2"
+            >
+              {isDark ? <Sun className="size-4" /> : <Moon className="size-4" />}
+              <span>{isDark ? 'Light mode' : 'Dark mode'}</span>
+            </Button>
+          </div>
 
           <a
             href="https://odell.xyz"
