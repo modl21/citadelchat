@@ -95,6 +95,30 @@ export function SetupWizard({ onComplete }: SetupWizardProps) {
   return (
     <div className="min-h-screen bg-gradient-to-b from-background via-background to-muted/20 p-4 sm:p-8">
       <div className="mx-auto max-w-5xl animate-fade-in-up">
+        <div className="mb-4 flex items-center justify-between gap-3 rounded-xl border bg-card/80 px-4 py-2 backdrop-blur">
+          <a
+            href="https://citadelwire.com"
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center gap-2 rounded-lg border border-transparent pr-2 transition hover:border-primary/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            <img
+              src="/citadel-logo.jpg"
+              alt="Citadel"
+              className="h-9 w-9 rounded-md object-contain"
+            />
+            <span className="text-sm font-semibold">Citadel</span>
+          </a>
+
+          <a
+            href="https://odell.xyz"
+            target="_blank"
+            rel="noreferrer"
+            className="text-xs text-primary underline-offset-4 hover:underline"
+          >
+            curated by ODELL
+          </a>
+        </div>
         <div className="mb-8 rounded-2xl border bg-card/80 p-6 shadow-xl backdrop-blur">
           <div className="mb-4 flex items-center gap-3">
             <div className="rounded-xl bg-primary/15 p-2 text-primary">

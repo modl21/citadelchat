@@ -211,7 +211,34 @@ export default function Index() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background via-background to-muted/20">
-      <div className="mx-auto grid min-h-screen max-w-[1600px] grid-cols-1 lg:grid-cols-[300px_minmax(0,1fr)]">
+      <div className="border-b bg-card/80 px-4 py-2 backdrop-blur sm:px-6">
+        <div className="mx-auto flex w-full max-w-[1600px] items-center justify-between gap-3">
+          <a
+            href="https://citadelwire.com"
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center gap-2 rounded-lg border border-transparent pr-2 transition hover:border-primary/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            <img
+              src="/citadel-logo.jpg"
+              alt="Citadel"
+              className="h-10 w-10 rounded-md object-contain"
+            />
+            <span className="text-sm font-semibold">Citadel</span>
+          </a>
+
+          <a
+            href="https://odell.xyz"
+            target="_blank"
+            rel="noreferrer"
+            className="text-xs text-primary underline-offset-4 hover:underline"
+          >
+            curated by ODELL
+          </a>
+        </div>
+      </div>
+
+      <div className="mx-auto grid min-h-[calc(100vh-57px)] max-w-[1600px] grid-cols-1 lg:grid-cols-[300px_minmax(0,1fr)]">
         <aside className="hidden border-r bg-card/50 lg:block">{Sidebar}</aside>
 
         <main className="flex min-h-screen flex-col">
@@ -230,35 +257,11 @@ export default function Index() {
                 </Sheet>
               </div>
 
-              <div className="flex items-center gap-3">
-                <a
-                  href="https://citadelwire.com"
-                  target="_blank"
-                  rel="noreferrer"
-                  aria-label="Visit Citadel Wire"
-                  className="inline-flex items-center rounded-lg border border-transparent transition hover:border-primary/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                >
-                  <img
-                    src="/citadel-logo.jpg"
-                    alt="Citadel"
-                    className="h-12 w-12 rounded-md object-contain"
-                  />
-                </a>
-                <div>
-                  <h1 className="text-lg font-semibold">{view === 'chat' ? 'Operations Chat' : view === 'library' ? 'Knowledge Library' : 'System Settings'}</h1>
-                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                    <p>{selectedModel ? `${selectedModel.name} · ${selectedModel.sizeLabel}` : 'No model selected'}</p>
-                    <span>•</span>
-                    <a
-                      href="https://odell.xyz"
-                      target="_blank"
-                      rel="noreferrer"
-                      className="text-primary underline-offset-4 hover:underline"
-                    >
-                      curated by ODELL
-                    </a>
-                  </div>
-                </div>
+              <div>
+                <h1 className="text-lg font-semibold">{view === 'chat' ? 'Operations Chat' : view === 'library' ? 'Knowledge Library' : 'System Settings'}</h1>
+                <p className="text-xs text-muted-foreground">
+                  {selectedModel ? `${selectedModel.name} · ${selectedModel.sizeLabel}` : 'No model selected'}
+                </p>
               </div>
 
               <DropdownMenu>
