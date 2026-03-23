@@ -85,17 +85,12 @@ export default {
 				'slide-in-left': {
 					from: { transform: 'translateX(-100%)', opacity: '0' },
 					to: { transform: 'translateX(0)', opacity: '1' }
-				},
-				'glow-pulse': {
-					'0%, 100%': { boxShadow: '0 0 15px -3px hsl(var(--primary) / 0.2)' },
-					'50%': { boxShadow: '0 0 25px -3px hsl(var(--primary) / 0.4)' }
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
 				'accordion-up': 'accordion-up 0.2s ease-out',
 				'slide-in-left': 'slide-in-left 0.3s ease-out',
-				'glow-pulse': 'glow-pulse 3s ease-in-out infinite',
 			}
 		}
 	},
