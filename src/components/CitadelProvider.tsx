@@ -360,6 +360,8 @@ export function CitadelProvider({ children }: { children: ReactNode }) {
         throw new Error('Browser runtime is required for local model loading.');
       }
 
+      console.log(`[Citadel] Initiating load for model: ${modelId}`);
+
       if (engineRef.current) {
         try {
           await engineRef.current.unload();
@@ -373,13 +375,16 @@ export function CitadelProvider({ children }: { children: ReactNode }) {
       const modelAppConfig = createModelAppConfig(webllm.prebuiltAppConfig);
 
       const modelExists = modelAppConfig.model_list.some((model) => model.model_id === modelId);
+      console.log(`[Citadel] Model ${modelId} exists in current runtime manifest: ${modelExists}. Total models available: ${modelAppConfig.model_list.length}`);
+
       if (!modelExists) {
-        throw new Error(`Model ${modelId} is not available in the current WebLLM runtime. Please choose another model.`);
+        throw new Error(`Model ${modelId} is not available in the current WebLLM runtime registry. Available models: ${modelAppConfig.model_list.map(m => m.model_id).slice(0, 5).join(', ')}...`);
       }
 
       const createdEngine = await webllm.CreateMLCEngine(modelId, {
         appConfig: modelAppConfig,
         initProgressCallback: (report) => {
+          console.log(`[Citadel] Load progress: ${report.text} (${Math.round(report.progress * 100)}%)`);
           setLoadProgress(normalizeProgress(report));
         },
       });
@@ -392,6 +397,7 @@ export function CitadelProvider({ children }: { children: ReactNode }) {
       await saveSetting(SETTINGS_KEY.selectedModelId, modelId);
       setAppSettings(current => ({ ...current, selectedModelId: modelId }));
     } catch (error) {
+      console.error('[Citadel] Critical load error:', error);
       const message = error instanceof Error ? error.message : 'Unknown error while loading model.';
       setEngineError(message);
       setIsEngineReady(false);
