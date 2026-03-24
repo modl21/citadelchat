@@ -168,6 +168,14 @@
   @apply mb-3;
 }
 
+.prose-citadel strong {
+  @apply font-semibold text-foreground;
+}
+
+.prose-citadel em {
+  @apply italic text-foreground;
+}
+
 .prose-citadel p:last-child {
   @apply mb-0;
 }
@@ -216,6 +224,12 @@
 
 .prose-citadel a {
   @apply underline underline-offset-4;
+}
+
+.prose-citadel li > code,
+.prose-citadel p > code,
+.prose-citadel blockquote > code {
+  @apply align-baseline;
 }
 
 @media (prefers-reduced-motion: reduce) {

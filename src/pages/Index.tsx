@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { type ReactNode, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Clock3,
   Download,
@@ -1166,6 +1166,187 @@ function BottomNav({
   );
 }
 
+function renderInlineMarkdown(text: string): ReactNode[] {
+  const nodes: ReactNode[] = [];
+  const pattern = /(\*\*[^*]+\*\*|\*[^*]+\*|`[^`]+`|\[[^\]]+\]\((https?:\/\/[^\s)]+)\))/g;
+  let lastIndex = 0;
+  let key = 0;
+
+  for (const match of text.matchAll(pattern)) {
+    const full = match[0];
+    const start = match.index ?? 0;
+
+    if (start > lastIndex) {
+      nodes.push(text.slice(lastIndex, start));
+    }
+
+    if (full.startsWith('**') && full.endsWith('**')) {
+      nodes.push(<strong key={`md-${key++}`}>{full.slice(2, -2)}</strong>);
+    } else if (full.startsWith('*') && full.endsWith('*')) {
+      nodes.push(<em key={`md-${key++}`}>{full.slice(1, -1)}</em>);
+    } else if (full.startsWith('`') && full.endsWith('`')) {
+      nodes.push(<code key={`md-${key++}`}>{full.slice(1, -1)}</code>);
+    } else {
+      const linkMatch = full.match(/^\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)$/);
+      if (linkMatch) {
+        const [, label, href] = linkMatch;
+        nodes.push(
+          <a key={`md-${key++}`} href={href} target="_blank" rel="noreferrer">
+            {label}
+          </a>,
+        );
+      } else {
+        nodes.push(full);
+      }
+    }
+
+    lastIndex = start + full.length;
+  }
+
+  if (lastIndex < text.length) {
+    nodes.push(text.slice(lastIndex));
+  }
+
+  return nodes;
+}
+
+function renderMarkdownLite(content: string): ReactNode {
+  if (!content.trim()) {
+    return content;
+  }
+
+  const lines = content.replace(/\r\n/g, '\n').split('\n');
+  const nodes: ReactNode[] = [];
+  let paragraphBuffer: string[] = [];
+  let listBuffer: string[] = [];
+  let codeBuffer: string[] = [];
+  let orderedList = false;
+  let inCodeBlock = false;
+
+  const flushParagraph = () => {
+    if (paragraphBuffer.length === 0) return;
+    const text = paragraphBuffer.join(' ').trim();
+    if (text) {
+      nodes.push(<p key={`p-${nodes.length}`}>{renderInlineMarkdown(text)}</p>);
+    }
+    paragraphBuffer = [];
+  };
+
+  const flushList = () => {
+    if (listBuffer.length === 0) return;
+    const ListTag = orderedList ? 'ol' : 'ul';
+    nodes.push(
+      <ListTag key={`l-${nodes.length}`}>
+        {listBuffer.map((item, index) => (
+          <li key={`li-${nodes.length}-${index}`}>{renderInlineMarkdown(item.trim())}</li>
+        ))}
+      </ListTag>,
+    );
+    listBuffer = [];
+    orderedList = false;
+  };
+
+  const flushCode = () => {
+    if (codeBuffer.length === 0) return;
+    nodes.push(
+      <pre key={`code-${nodes.length}`}>
+        <code>{codeBuffer.join('\n')}</code>
+      </pre>,
+    );
+    codeBuffer = [];
+  };
+
+  for (const rawLine of lines) {
+    const line = rawLine;
+    const trimmed = line.trim();
+
+    if (trimmed.startsWith('```')) {
+      flushParagraph();
+      flushList();
+
+      if (inCodeBlock) {
+        flushCode();
+      }
+
+      inCodeBlock = !inCodeBlock;
+      continue;
+    }
+
+    if (inCodeBlock) {
+      codeBuffer.push(line);
+      continue;
+    }
+
+    if (!trimmed) {
+      flushParagraph();
+      flushList();
+      continue;
+    }
+
+    const heading = trimmed.match(/^(#{1,3})\s+(.*)$/);
+    if (heading) {
+      flushParagraph();
+      flushList();
+      const level = heading[1].length;
+      const headingText = heading[2].trim();
+      if (level === 1) {
+        nodes.push(<h1 key={`h-${nodes.length}`}>{renderInlineMarkdown(headingText)}</h1>);
+      } else if (level === 2) {
+        nodes.push(<h2 key={`h-${nodes.length}`}>{renderInlineMarkdown(headingText)}</h2>);
+      } else {
+        nodes.push(<h3 key={`h-${nodes.length}`}>{renderInlineMarkdown(headingText)}</h3>);
+      }
+      continue;
+    }
+
+    if (trimmed.startsWith('> ')) {
+      flushParagraph();
+      flushList();
+      nodes.push(
+        <blockquote key={`q-${nodes.length}`}>{renderInlineMarkdown(trimmed.slice(2).trim())}</blockquote>,
+      );
+      continue;
+    }
+
+    const unordered = trimmed.match(/^[-*]\s+(.*)$/);
+    if (unordered) {
+      flushParagraph();
+      if (listBuffer.length > 0 && orderedList) {
+        flushList();
+      }
+      orderedList = false;
+      listBuffer.push(unordered[1]);
+      continue;
+    }
+
+    const ordered = trimmed.match(/^\d+\.\s+(.*)$/);
+    if (ordered) {
+      flushParagraph();
+      if (listBuffer.length > 0 && !orderedList) {
+        flushList();
+      }
+      orderedList = true;
+      listBuffer.push(ordered[1]);
+      continue;
+    }
+
+    paragraphBuffer.push(trimmed);
+  }
+
+  flushParagraph();
+  flushList();
+
+  if (inCodeBlock || codeBuffer.length > 0) {
+    flushCode();
+  }
+
+  if (nodes.length === 0) {
+    return content;
+  }
+
+  return <>{nodes}</>;
+}
+
 function MessageBubble({ message }: { message: CitadelMessage }) {
   const isUser = message.role === 'user';
 
@@ -1173,7 +1354,7 @@ function MessageBubble({ message }: { message: CitadelMessage }) {
     <div className={cn('animate-message-in flex', isUser ? 'justify-end' : 'justify-start')}>
       <div className={cn('max-w-[min(72ch,88%)]', isUser && 'rounded-xl bg-foreground/[0.05] px-4 py-3')}>
         <div className={cn('whitespace-pre-wrap break-words text-[15px] leading-7', !isUser && 'prose-citadel')}>
-          {message.content || <span className="typing-cursor">thinking</span>}
+          {message.content ? (isUser ? message.content : renderMarkdownLite(message.content)) : <span className="typing-cursor">thinking</span>}
         </div>
         {message.runtimeStats && (
           <p className="mt-2 font-mono text-[11px] text-muted-foreground">{message.runtimeStats}</p>
