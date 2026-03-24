@@ -1,0 +1,43 @@
+{
+  "id": "water-systems",
+  "title": "Water Systems and Sanitation Engineering",
+  "version": "1.0.0",
+  "updatedAt": "2026-03-24",
+  "documents": [
+    {
+      "id": "source-priority",
+      "title": "Water Source Priority and Risk",
+      "content": "Prioritize protected springs and deep wells, then rain catchment, then surface water with full treatment. Map all local sources and seasonal reliability on paper. Identify contamination risks upstream: agriculture runoff, industrial waste, sewage discharge, and animal concentration zones."
+    },
+    {
+      "id": "gravity-systems",
+      "title": "Gravity-Fed Storage and Distribution",
+      "content": "Use elevation whenever possible to reduce pump dependency. Install covered storage tanks at high points and route distribution through shutoff zones for maintenance isolation. Add overflow controls and sediment traps. Label valves clearly and train all operators on system layout."
+    },
+    {
+      "id": "treatment-train",
+      "title": "Treatment Train Design",
+      "content": "Use multi-stage treatment: settling, coarse filtration, fine filtration, then disinfection. No single step is enough for all hazards. Keep spare filter media, replacement cartridges, and disinfection chemicals in dry storage. Test turbidity and chlorine residual whenever practical."
+    },
+    {
+      "id": "chlorination-protocol",
+      "title": "Chlorination Protocol Basics",
+      "content": "Pre-filter cloudy water first. Dose according to concentration and volume, mix thoroughly, and allow adequate contact time before use. Keep treatment logs by batch and date. If odor/taste is excessive, aerate treated water rather than reducing disinfection to unsafe levels."
+    },
+    {
+      "id": "latrine-placement",
+      "title": "Latrine Siting and Waste Separation",
+      "content": "Site latrines downhill and downwind from water sources and living areas with adequate soil depth and drainage. Separate urine and solid waste streams when possible to reduce odor and contamination spread. Cover waste layers and maintain handwashing stations at every sanitation point."
+    },
+    {
+      "id": "greywater-reuse",
+      "title": "Greywater Reuse and Drainage",
+      "content": "Direct greywater to infiltration basins or mulch trenches away from foundations and wells. Avoid pooling near living spaces to reduce insects and pathogens. Use grease traps for kitchen outflow and inspect weekly. Reuse only for non-potable irrigation after simple settling/filtration."
+    },
+    {
+      "id": "pump-maintenance",
+      "title": "Pump and Pipe Maintenance",
+      "content": "Inspect pumps for seal leaks, overheating, cavitation noise, and pressure drop trends. Keep spare impellers, seals, gaskets, check valves, and common pipe fittings. Winterize exposed lines and install drain points. Run preventive checks on a fixed schedule, not only after failures."
+    }
+  ]
+}

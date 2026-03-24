@@ -1,4 +1,4 @@
-const CACHE_NAME = 'citadel-chat-cache-v3';
+const CACHE_NAME = 'citadel-chat-cache-v4';
 const OFFLINE_ASSETS = [
   '/',
   '/index.html',
@@ -13,6 +13,11 @@ const OFFLINE_ASSETS = [
   '/knowledge-packs/off-grid-medicine.json',
   '/knowledge-packs/cbrn-survival.json',
   '/knowledge-packs/trade-barter.json',
+  '/knowledge-packs/firearms-weapons.json',
+  '/knowledge-packs/perimeter-defense.json',
+  '/knowledge-packs/mechanical-repair.json',
+  '/knowledge-packs/fuel-heat-cooking.json',
+  '/knowledge-packs/water-systems.json',
 ];
 
 self.addEventListener('install', (event) => {

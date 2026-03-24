@@ -1,0 +1,48 @@
+{
+  "id": "firearms-weapons",
+  "title": "Firearms and Defensive Weapons",
+  "version": "1.0.0",
+  "updatedAt": "2026-03-24",
+  "documents": [
+    {
+      "id": "safety-baseline",
+      "title": "Weapons Safety Baseline",
+      "content": "Apply four rules continuously: treat every weapon as loaded, never point at anything you are unwilling to destroy, keep finger off trigger until sights are on target, and know your target plus what is behind it. Build safety checks into every handoff, loading cycle, and storage routine. Under fatigue, slow down and verbalize each step."
+    },
+    {
+      "id": "storage-readiness",
+      "title": "Storage and Ready Condition Planning",
+      "content": "Store firearms dry, secured, and separated by role (patrol, home defense, hunting, training). Keep magazines, slings, lights, and cleaning kits staged in labeled bins. Define ready conditions for each context and train everyone on the exact chamber/magazine status expected in those conditions."
+    },
+    {
+      "id": "maintenance-cycle",
+      "title": "Maintenance Cycle Without Armory Support",
+      "content": "After each use: clear, inspect bore/chamber, remove carbon, lightly lubricate friction points, and function-check. Weekly: inspect springs, extractor tension, screws, optics mounts, and light batteries. Monthly: rotate carried ammunition and inspect for corrosion or setback. Log every malfunction with round count to identify failing parts early."
+    },
+    {
+      "id": "zero-confirmation",
+      "title": "Zeroing and Confirmation Workflow",
+      "content": "Maintain a confirmed zero card for each weapon/optic pair. Reconfirm zero after drops, hard transport, optics removal, or major temperature shifts. Use known-distance verification at 25, 50, and practical engagement ranges. Keep sight adjustment tools and spare optic batteries with each platform."
+    },
+    {
+      "id": "ammo-discipline",
+      "title": "Ammunition Discipline Under Scarcity",
+      "content": "Segment ammunition into reserve, operational, and training lots. Never train from strategic reserve unless replacing stock. Track lot numbers, storage conditions, and quantities in a written ledger. Prioritize reliability and common calibers across group weapons to simplify resupply and reduce dead inventory."
+    },
+    {
+      "id": "low-light-identification",
+      "title": "Low-Light Identification and Engagement",
+      "content": "Positive identification is mandatory before engagement. Use white light in short controlled bursts, avoid backlighting teammates, and pre-plan sectors of fire. Practice communication commands for contact direction, friendly movement, and cease-fire. Most low-light errors are identification failures, not marksmanship failures."
+    },
+    {
+      "id": "alternate-weapons",
+      "title": "Alternate Weapons and Less-Lethal Layers",
+      "content": "Build layered defense: firearm capability, edged tools, impact tools, and distance barriers. Train deployment thresholds and retention methods for each tool category. In constrained environments, emphasize de-escalation, barriers, and controlled withdrawal routes over forced confrontation whenever possible."
+    },
+    {
+      "id": "team-fire-control",
+      "title": "Team Fire Control and Sector Discipline",
+      "content": "Assign sectors before movement and repeat them during halts. Use short plain-language commands: contact direction, distance, movement order, and cease-fire. Avoid crossing muzzles across teammates while repositioning. Every team member should know who owns each lane and who calls break-contact."
+    }
+  ]
+}

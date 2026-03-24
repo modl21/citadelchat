@@ -1,0 +1,43 @@
+{
+  "id": "fuel-heat-cooking",
+  "title": "Fuel, Heat, and Off-Grid Cooking",
+  "version": "1.0.0",
+  "updatedAt": "2026-03-24",
+  "documents": [
+    {
+      "id": "fuel-priority",
+      "title": "Fuel Priority Matrix",
+      "content": "Allocate fuel by mission priority: medical and water treatment first, food preservation second, heating/cooking third, mobility last unless evacuation is required. Separate strategic reserve from daily-use stock. Track burn rate weekly and recalculate endurance after weather or population changes."
+    },
+    {
+      "id": "wood-management",
+      "title": "Firewood Harvest and Seasoning",
+      "content": "Cut, split, and stack wood under cover with airflow. Season hardwoods long enough to reduce moisture for clean burning. Keep kindling, medium fuel, and long-burn logs staged separately. Rotate stack by age so older dry stock is consumed first."
+    },
+    {
+      "id": "stove-operations",
+      "title": "Solid-Fuel Stove Operations",
+      "content": "Use dry fuel and maintain draft control to reduce smoke and creosote. Inspect flues and spark arrestors frequently. Install heat shields with correct clearances around combustible walls. Keep ash removal tools and metal containers dedicated to live ash handling."
+    },
+    {
+      "id": "liquid-fuel-safety",
+      "title": "Liquid Fuel Safety and Storage",
+      "content": "Store gasoline, diesel, kerosene, and alcohol fuels in approved containers away from living spaces and ignition sources. Label clearly by type and date. Use filtration funnels for transfer and avoid mixed-fuel contamination. Test old fuel in small batches before critical use."
+    },
+    {
+      "id": "cold-weather-retention",
+      "title": "Heat Retention in Cold Conditions",
+      "content": "Weatherstrip doors/windows, isolate unused rooms, add interior thermal curtains, and reduce convective loss in sleeping areas. Prioritize insulation improvements before increasing fuel burn. Small sealing improvements can dramatically extend heating endurance through winter."
+    },
+    {
+      "id": "off-grid-cooking",
+      "title": "Off-Grid Cooking Workflows",
+      "content": "Design meal plans by fuel class: no-cook, quick-boil, simmer, and bake. Batch-cook staple foods to reduce repeated ignition cycles. Use retained-heat methods (insulated pot wraps, thermal boxes) to finish cooking with less fuel. Maintain strict food safety timing for leftovers."
+    },
+    {
+      "id": "fire-prevention",
+      "title": "Fire Prevention and Response",
+      "content": "Place extinguishers and fire blankets at kitchen, heater, generator, and fuel transfer points. Train all members on extinguisher use and emergency shutoff procedures. Conduct monthly drills for structure fire response, including nighttime egress and accountability checks."
+    }
+  ]
+}

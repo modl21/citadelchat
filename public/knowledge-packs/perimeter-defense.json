@@ -1,0 +1,43 @@
+{
+  "id": "perimeter-defense",
+  "title": "Perimeter Defense and Site Hardening",
+  "version": "1.0.0",
+  "updatedAt": "2026-03-24",
+  "documents": [
+    {
+      "id": "layered-defense",
+      "title": "Layered Perimeter Design",
+      "content": "Build concentric layers: early warning zone, delay/obstacle zone, and controlled inner zone. Use terrain, fencing, natural choke points, and controlled gates to slow unknown movement. Keep clear visual references for boundary lines so all defenders understand where challenge, hold, and escalation decisions occur."
+    },
+    {
+      "id": "observation-posts",
+      "title": "Observation Posts and Overwatch",
+      "content": "Position observation posts with overlap and clear fallback routes. Rotate watch schedules to prevent fatigue blindness. Equip each post with optics, map sketch, comms backup, and challenge procedures. Log movement patterns by time block to detect anomalies rather than relying on memory alone."
+    },
+    {
+      "id": "entry-control",
+      "title": "Entry Control Point Procedures",
+      "content": "Use one primary entry and one emergency route. At controlled entry, separate approach, questioning, search, and release areas. Keep physical cover near gate personnel and maintain cross-coverage from a secondary observer. Document visitor identity markers, intent, and departure direction."
+    },
+    {
+      "id": "night-discipline",
+      "title": "Night Security and Light Discipline",
+      "content": "Reduce visible light from living areas, enforce blackout curtains, and shield task lights downward. Use passive indicators (trip-lines, reflective markers, gravel paths) to detect movement quietly. Establish strict challenge/password windows and immediate fallback plans for failed identification at night."
+    },
+    {
+      "id": "alarm-network",
+      "title": "Low-Tech Alarm Network",
+      "content": "Create redundant alarms using mechanical noisemakers, line tension indicators, and observation check-ins. Mark every alarm point on a paper map and test daily. Alarms should trigger decision protocols, not panic: verify, report, reinforce, and only then escalate force posture."
+    },
+    {
+      "id": "patrol-patterns",
+      "title": "Patrol Patterns and Counter-Surveillance",
+      "content": "Avoid predictable patrol timing and routes. Alternate direction, interval, and stop points. Use short deliberate halts for listening checks and rear security. Record signs of probing behavior such as repeated footprints, disturbed markers, or line-of-sight testing from nearby cover."
+    },
+    {
+      "id": "contact-drills",
+      "title": "Contact and Break-Contact Drills",
+      "content": "Pre-brief immediate action drills for near and far contact. Define who reports, who suppresses, who moves, and who secures casualties. Rehearse break-contact routes and rally points in daylight and darkness. Drills reduce confusion and prevent friendly-fire in high-stress moments."
+    }
+  ]
+}

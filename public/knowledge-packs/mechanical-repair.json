@@ -1,0 +1,48 @@
+{
+  "id": "mechanical-repair",
+  "title": "Mechanical Repair and Fabrication",
+  "version": "1.0.0",
+  "updatedAt": "2026-03-24",
+  "documents": [
+    {
+      "id": "critical-spares",
+      "title": "Critical Spares Planning",
+      "content": "Stock consumables and high-failure parts first: belts, bearings, seals, hoses, filters, fuses, relays, lubricants, and fasteners. Build spare kits by system (water pumps, generators, transport, tools). Keep one active kit and one deep reserve kit, both labeled with compatibility notes."
+    },
+    {
+      "id": "minimum-toolkit",
+      "title": "Minimum Hand Tool Baseline",
+      "content": "Maintain a robust core kit: metric/imperial sockets, combination wrenches, torque wrench, screwdrivers, pliers, locking pliers, punches, files, taps/dies, hacksaw, clamps, and multimeter. Duplicate the most-used sizes. Organize by shadow-board or roll so missing tools are obvious."
+    },
+    {
+      "id": "fastener-standardization",
+      "title": "Fastener and Material Standardization",
+      "content": "Standardize bolt grades, thread pitches, and common stock dimensions across equipment where possible. Mixed standards increase downtime and tool burden. Keep a handwritten substitution chart for equivalent thread/strength options when exact replacements are unavailable."
+    },
+    {
+      "id": "field-expedient-repairs",
+      "title": "Field-Expedient Repair Methods",
+      "content": "Use temporary repairs to restore function safely until full replacement is possible: hose splicing, gasket cutting, splinting cracked housings, and reinforced brackets. Mark all temporary repairs visibly and schedule immediate follow-up. Temporary fixes fail when forgotten."
+    },
+    {
+      "id": "rotating-components",
+      "title": "Belts, Bearings, and Alignment",
+      "content": "Most mechanical failures begin with poor alignment or lubrication. Check belt tension, pulley alignment, bearing heat/noise, and shaft play during each inspection cycle. Replace bearings in matched sets when possible. Keep extraction tools and anti-seize compounds available."
+    },
+    {
+      "id": "joining-metal",
+      "title": "Metal Joining and Structural Patching",
+      "content": "Prioritize safe joints: clean surfaces, remove paint/rust, and fit parts before heat application. Where welding is unavailable, use bolted gussets, rivets, and mechanical clamps. Reinforce high-vibration points and inspect patched joints frequently for crack propagation."
+    },
+    {
+      "id": "generator-upkeep",
+      "title": "Generator and Motor Upkeep",
+      "content": "Track runtime hours, oil intervals, spark plug condition, air filter status, and fuel quality. Run standby generators under load on a set schedule to detect issues before emergencies. Protect alternators and electronics from moisture and dust using filtered enclosures where possible."
+    },
+    {
+      "id": "maintenance-ledger",
+      "title": "Maintenance Logging and Failure Tracking",
+      "content": "Keep paper logs for every critical machine: date, work performed, parts replaced, run hours, and symptoms observed. Trend analysis from simple logs predicts failures better than memory. Assign one person as maintenance controller to prevent duplicated or missed tasks."
+    }
+  ]
+}
