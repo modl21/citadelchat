@@ -1,19 +1,6 @@
-import { useEffect, useMemo, useState } from 'react';
-import {
-  Brain,
-  DownloadCloud,
-  HardDrive,
-  Menu,
-  MessageSquare,
-  Moon,
-  PlugZap,
-  Send,
-  Settings,
-  Sun,
-  Wifi,
-  WifiOff,
-} from 'lucide-react';
-import type { ComponentType, ReactNode } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { HardDrive, Menu, MessageSquare, Send, Settings } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 
 import { useSeoMeta } from '@unhead/react';
 
@@ -25,13 +12,7 @@ import { formatBytes } from '@/lib/webllm-models';
 
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Textarea } from '@/components/ui/textarea';
-import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
 import { Switch } from '@/components/ui/switch';
-import { Skeleton } from '@/components/ui/skeleton';
 import {
   Sheet,
   SheetContent,
@@ -48,22 +29,6 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
 
 const INITIAL_MESSAGE: CitadelMessage = {
   id: 'welcome',
@@ -73,6 +38,18 @@ const INITIAL_MESSAGE: CitadelMessage = {
 };
 
 type AppView = 'chat' | 'library' | 'settings';
+
+interface NavItem {
+  id: AppView;
+  label: string;
+  icon: LucideIcon;
+}
+
+const NAV_ITEMS: NavItem[] = [
+  { id: 'chat', label: 'Chat', icon: MessageSquare },
+  { id: 'library', label: 'Library', icon: HardDrive },
+  { id: 'settings', label: 'Settings', icon: Settings },
+];
 
 export default function Index() {
   useSeoMeta({
@@ -88,27 +65,22 @@ export default function Index() {
     downloadedPackIds,
     engineError,
     getStorageInfo,
-    hasWebGpu,
-    runtimeCompatibility,
     isEngineReady,
     isLoadingEngine,
-    isOnline,
     loadModel,
     loadProgress,
     removeKnowledgePack,
     resetApplicationData,
+    runtimeCompatibility,
     saveSettings,
     sendMessage,
   } = useCitadel();
+
   const { theme, setTheme } = useTheme();
-  const isDark = theme === 'dark';
 
   const [setupCompletedState, setSetupCompletedState] = useState(appSettings.setupComplete);
-
-  useEffect(() => {
-    setSetupCompletedState(appSettings.setupComplete);
-  }, [appSettings.setupComplete]);
   const [view, setView] = useState<AppView>('chat');
+  const [mobileRailOpen, setMobileRailOpen] = useState(false);
 
   const [messages, setMessages] = useState<CitadelMessage[]>([INITIAL_MESSAGE]);
   const [prompt, setPrompt] = useState('');
@@ -118,12 +90,25 @@ export default function Index() {
   const [storageUsage, setStorageUsage] = useState<{ usedBytes: number; quotaBytes: number } | null>(null);
   const [loadingStorage, setLoadingStorage] = useState(false);
 
-  const setupIsComplete = setupCompletedState && appSettings.setupComplete;
+  const composerRef = useRef<HTMLTextAreaElement | null>(null);
+  const messageEndRef = useRef<HTMLDivElement | null>(null);
 
-  const selectedModel = useMemo(
-    () => availableModels.find(model => model.id === (currentModelId ?? appSettings.selectedModelId)),
-    [availableModels, currentModelId, appSettings.selectedModelId],
-  );
+  useEffect(() => {
+    setSetupCompletedState(appSettings.setupComplete);
+  }, [appSettings.setupComplete]);
+
+  useEffect(() => {
+    const node = composerRef.current;
+    if (!node) return;
+    node.style.height = 'auto';
+    node.style.height = `${Math.min(node.scrollHeight, 176)}px`;
+  }, [prompt]);
+
+  useEffect(() => {
+    messageEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
+  }, [messages]);
+
+  const setupIsComplete = setupCompletedState && appSettings.setupComplete;
 
   const installedPacks = useMemo(
     () => KNOWLEDGE_PACKS.filter(pack => downloadedPackIds.includes(pack.id)),
@@ -134,351 +119,236 @@ export default function Index() {
     return <SetupWizard onComplete={() => setSetupCompletedState(true)} />;
   }
 
-  const Sidebar = (
-    <div className="flex h-full flex-col gap-4 p-4">
-      <div className="rounded-2xl border bg-card/90 p-4 shadow-sm">
-        <div className="flex items-center gap-3">
-          <div className="rounded-xl bg-primary/10 p-2 text-primary">
-            <Brain className="size-5" />
-          </div>
-          <div>
-            <h2 className="font-semibold leading-tight">Citadel Chat</h2>
-            <p className="text-xs text-muted-foreground">Offline command center</p>
-          </div>
-        </div>
-      </div>
-
-      <div className="space-y-2">
-        <SidebarButton active={view === 'chat'} icon={MessageSquare} onClick={() => setView('chat')}>
-          Chat
-        </SidebarButton>
-        <SidebarButton active={view === 'library'} icon={HardDrive} onClick={() => setView('library')}>
-          Library
-        </SidebarButton>
-        <SidebarButton active={view === 'settings'} icon={Settings} onClick={() => setView('settings')}>
-          Settings
-        </SidebarButton>
-      </div>
-
-      <Separator />
-
-      <Card className="border-dashed">
-        <CardContent className="space-y-3 p-4">
-          <StatusRow
-            label="Network"
-            value={isOnline ? 'Online' : 'Offline'}
-            icon={isOnline ? Wifi : WifiOff}
-            tone={isOnline ? 'ok' : 'warn'}
-          />
-          <StatusRow
-            label="WebGPU"
-            value={hasWebGpu ? 'Detected' : 'Missing'}
-            icon={PlugZap}
-            tone={hasWebGpu ? 'ok' : 'warn'}
-          />
-          <StatusRow
-            label="Model"
-            value={isEngineReady ? 'Loaded' : isLoadingEngine ? 'Loading' : 'Idle'}
-            icon={Brain}
-            tone={isEngineReady ? 'ok' : 'warn'}
-          />
-        </CardContent>
-      </Card>
-
-      {isLoadingEngine && (
-        <Card>
-          <CardContent className="space-y-2 p-4">
-            <p className="text-xs text-muted-foreground">{loadProgress.text}</p>
-            <div className="h-2 rounded-full bg-muted">
-              <div
-                className="h-2 rounded-full bg-primary transition-all"
-                style={{ width: `${Math.round(loadProgress.progress * 100)}%` }}
-              />
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {engineError && (
-        <Card className="border-destructive/40">
-          <CardContent className="p-4 text-xs text-destructive">{engineError}</CardContent>
-        </Card>
-      )}
-
-      {runtimeCompatibility.status !== 'supported' && (
-        <Card className={cn('border-dashed', runtimeCompatibility.status === 'unsupported' ? 'border-destructive/40' : 'border-amber-500/40')}>
-          <CardContent className="space-y-2 p-4 text-xs">
-            <p className="font-semibold">{runtimeCompatibility.headline}</p>
-            <p className="text-muted-foreground">{runtimeCompatibility.detail}</p>
-            <ul className="list-disc pl-4 text-muted-foreground">
-              {runtimeCompatibility.recommendations.map((tip) => (
-                <li key={tip}>{tip}</li>
-              ))}
-            </ul>
-          </CardContent>
-        </Card>
-      )}
-
-      <div className="mt-auto pt-4 text-center">
-        <a
-          href="https://shakespeare.diy"
-          target="_blank"
-          rel="noreferrer"
-          className="text-[10px] uppercase tracking-widest text-muted-foreground/50 transition hover:text-primary"
-        >
-          Vibed with Shakespeare
-        </a>
-      </div>
-    </div>
-  );
-
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background via-background to-muted/20">
-      <div className="border-b bg-card/80 px-4 py-2 backdrop-blur sm:px-6">
-        <div className="mx-auto grid w-full max-w-[1600px] grid-cols-[auto_1fr_auto] items-center gap-3">
-          <a
-            href="https://citadelwire.com"
-            target="_blank"
-            rel="noreferrer"
-            className="inline-flex items-center rounded-lg border border-transparent p-1 transition hover:border-primary/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-          >
-            <img
-              src="/citadel-logo.jpg"
-              alt="Citadel"
-              className="h-10 w-10 rounded-md object-contain"
-            />
-          </a>
+    <div className="min-h-screen bg-background text-foreground">
+      {isLoadingEngine && (
+        <div className="fixed inset-x-0 top-0 z-50 h-px bg-border/60">
+          <div
+            className="h-full bg-primary transition-[width] duration-150 ease-out"
+            style={{ width: `${Math.round(loadProgress.progress * 100)}%` }}
+          />
+        </div>
+      )}
 
-          <div className="justify-self-center">
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() => setTheme(isDark ? 'light' : 'dark')}
-              aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
-              className="inline-flex items-center gap-2"
-            >
-              {isDark ? <Sun className="size-4" /> : <Moon className="size-4" />}
-              <span>{isDark ? 'Light mode' : 'Dark mode'}</span>
-            </Button>
+      <div className="flex min-h-screen">
+        <aside className="hidden w-16 shrink-0 border-r border-sidebar-border/80 bg-sidebar md:block">
+          <NavigationRail
+            view={view}
+            onViewChange={setView}
+          />
+        </aside>
+
+        <main className="relative flex min-h-screen flex-1 flex-col">
+          <div className="absolute left-3 top-3 z-20 md:hidden">
+            <Sheet open={mobileRailOpen} onOpenChange={setMobileRailOpen}>
+              <SheetTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-9 w-9 rounded-md border border-border/70 bg-background/85 text-muted-foreground"
+                  aria-label="Open navigation"
+                >
+                  <Menu className="size-4" />
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="left" className="w-full max-w-none border-r border-border/80 bg-sidebar p-0">
+                <NavigationRail
+                  view={view}
+                  onViewChange={(nextView) => {
+                    setView(nextView);
+                    setMobileRailOpen(false);
+                  }}
+                />
+              </SheetContent>
+            </Sheet>
           </div>
 
-          <a
-            href="https://odell.xyz"
-            target="_blank"
-            rel="noreferrer"
-            className="inline-flex items-center gap-2 rounded-lg border border-transparent px-2 py-1 text-xs text-primary underline-offset-4 transition hover:border-primary/30 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-          >
-            <span>curated by ODELL</span>
-            <img
-              src="/odell-badge.jpg"
-              alt="ODELL"
-              className="h-6 w-6 rounded object-cover"
-            />
-          </a>
-        </div>
-      </div>
-
-      <div className="mx-auto grid min-h-[calc(100vh-57px)] max-w-[1600px] grid-cols-1 lg:grid-cols-[300px_minmax(0,1fr)]">
-        <aside className="hidden border-r bg-card/50 lg:block">{Sidebar}</aside>
-
-        <main className="flex min-h-screen flex-col">
-          <header className="sticky top-0 z-10 border-b bg-background/85 px-4 py-3 backdrop-blur sm:px-6">
-            <div className="flex items-center justify-between gap-3">
-              <div className="flex items-center gap-2 lg:hidden">
-                <Sheet>
-                  <SheetTrigger asChild>
-                    <Button variant="outline" size="icon">
-                      <Menu className="size-4" />
-                    </Button>
-                  </SheetTrigger>
-                  <SheetContent side="left" className="w-[300px] p-0">
-                    {Sidebar}
-                  </SheetContent>
-                </Sheet>
-              </div>
-
-              <div>
-                <h1 className="text-lg font-semibold">{view === 'chat' ? 'Operations Chat' : view === 'library' ? 'Knowledge Library' : 'System Settings'}</h1>
-                <p className="text-xs text-muted-foreground">
-                  {selectedModel ? `${selectedModel.name} · ${selectedModel.sizeLabel}` : 'No model selected'}
-                </p>
-              </div>
-
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" size="sm">Quick Actions</Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuLabel>Citadel</DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => setView('chat')}>Open chat</DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => setView('library')}>Open library</DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => setView('settings')}>Open settings</DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-          </header>
-
-          <div className="flex-1 p-4 sm:p-6">
-            {view === 'chat' && (
-              <Card className="mx-auto flex h-[calc(100vh-9rem)] max-w-4xl flex-col overflow-hidden">
-                <CardHeader className="pb-4">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <Badge variant={isEngineReady ? 'default' : 'secondary'}>{isEngineReady ? 'Model ready' : 'Model not loaded'}</Badge>
-                    <Badge variant="outline">Packs: {installedPacks.length}</Badge>
-                    <div className="ml-auto flex items-center gap-2 text-xs text-muted-foreground">
-                      <span>Use knowledge</span>
-                      <Switch checked={useKnowledge} onCheckedChange={setUseKnowledge} />
-                    </div>
+          {view === 'chat' && (
+            <section className="flex h-screen min-h-screen flex-col px-5 pb-6 pt-14 md:px-12 md:pb-8 md:pt-8 lg:px-16">
+              <div className="mx-auto flex w-full max-w-4xl flex-1 min-h-0 flex-col">
+                <div className="flex-1 overflow-y-auto">
+                  <div className="space-y-8 pb-6">
+                    {messages.map(message => (
+                      <MessageBubble key={message.id} message={message} />
+                    ))}
+                    <div ref={messageEndRef} />
                   </div>
-                </CardHeader>
+                </div>
 
-                <CardContent className="flex flex-1 min-h-0 flex-col gap-4">
-                  <ScrollArea className="flex-1 rounded-xl border bg-muted/15 p-4">
-                    <div className="space-y-4">
-                      {messages.map(message => (
-                        <MessageBubble key={message.id} message={message} />
-                      ))}
+                <form
+                  className="pt-3"
+                  onSubmit={(event) => {
+                    event.preventDefault();
+                    void handleSend();
+                  }}
+                >
+                  {engineError && (
+                    <p className="mb-2 text-xs text-destructive">{engineError}</p>
+                  )}
 
-                      {isSending && (
-                        <div className="rounded-xl border bg-background p-4">
-                          <Skeleton className="mb-2 h-4 w-1/4" />
-                          <Skeleton className="mb-2 h-4 w-11/12" />
-                          <Skeleton className="h-4 w-2/3" />
-                        </div>
-                      )}
-                    </div>
-                  </ScrollArea>
+                  {isLoadingEngine && (
+                    <p className="mb-2 text-xs font-mono text-muted-foreground">{loadProgress.text}</p>
+                  )}
 
-                  <div className="space-y-2">
-                    <Textarea
+                  <div className="relative">
+                    <textarea
+                      ref={composerRef}
                       value={prompt}
                       onChange={(event) => setPrompt(event.target.value)}
-                      placeholder="Ask Citadel Chat…"
-                      className="min-h-[110px]"
+                      placeholder={isEngineReady ? 'ask anything' : 'load a model in settings to begin'}
+                      disabled={!isEngineReady || isSending}
+                      rows={1}
+                      className="w-full resize-none overflow-y-auto border-0 border-b border-border bg-transparent px-0 py-3 pr-10 text-[15px] leading-7 text-foreground outline-none placeholder:text-muted-foreground/75 focus:border-primary disabled:cursor-not-allowed disabled:opacity-55"
                       onKeyDown={(event) => {
-                        if ((event.metaKey || event.ctrlKey) && event.key === 'Enter') {
+                        if (event.key === 'Enter' && !event.shiftKey) {
                           event.preventDefault();
                           void handleSend();
                         }
                       }}
                     />
-                    <div className="flex items-center justify-between gap-3">
-                      <p className="text-xs text-muted-foreground">Ctrl/Cmd + Enter to send</p>
-                      <Button onClick={() => void handleSend()} disabled={!prompt.trim() || isSending || !isEngineReady}>
-                        <Send className="mr-2 size-4" />
-                        Send
-                      </Button>
-                    </div>
+
+                    <button
+                      type="submit"
+                      disabled={!prompt.trim() || isSending || !isEngineReady}
+                      aria-label="Send"
+                      className={cn(
+                        'absolute bottom-2 right-0 inline-flex h-7 w-7 items-center justify-center rounded-full text-primary transition-opacity duration-100 ease-out disabled:pointer-events-none disabled:text-muted-foreground/40',
+                        prompt.trim() ? 'opacity-100' : 'pointer-events-none opacity-0',
+                      )}
+                    >
+                      <Send className="size-4" />
+                    </button>
                   </div>
-                </CardContent>
-              </Card>
-            )}
-
-            {view === 'library' && (
-              <div className="mx-auto max-w-5xl space-y-4">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Downloaded Knowledge Packs</CardTitle>
-                    <CardDescription>
-                      Packs are stored in browser IndexedDB and remain available offline.
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    {installedPacks.length === 0 ? (
-                      <div className="rounded-xl border border-dashed p-8 text-center text-muted-foreground">
-                        No packs installed. Re-run setup to add offline knowledge packs.
-                      </div>
-                    ) : (
-                      <Table>
-                        <TableHeader>
-                          <TableRow>
-                            <TableHead>Pack</TableHead>
-                            <TableHead>Size</TableHead>
-                            <TableHead>Docs</TableHead>
-                            <TableHead className="text-right">Action</TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {installedPacks.map(pack => (
-                            <TableRow key={pack.id}>
-                              <TableCell>
-                                <div>
-                                  <p className="font-medium">{pack.title}</p>
-                                  <p className="text-xs text-muted-foreground">{pack.description}</p>
-                                </div>
-                              </TableCell>
-                              <TableCell>{pack.sizeLabel}</TableCell>
-                              <TableCell>{pack.docCount}</TableCell>
-                              <TableCell className="text-right">
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={() => void removeKnowledgePack(pack.id)}
-                                >
-                                  Remove
-                                </Button>
-                              </TableCell>
-                            </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
-                    )}
-                  </CardContent>
-                </Card>
+                </form>
               </div>
-            )}
+            </section>
+          )}
 
-            {view === 'settings' && (
-              <div className="mx-auto max-w-5xl space-y-4">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Local Model Management</CardTitle>
-                    <CardDescription>
-                      Switch models based on performance needs. Cached status shows local availability.
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="grid gap-3 sm:grid-cols-2">
-                    {availableModels.map(model => {
-                      const cached = cachedModelStatus[model.id];
-                      const active = model.id === (currentModelId ?? appSettings.selectedModelId);
+          {view === 'library' && (
+            <section className="h-screen overflow-y-auto px-5 pb-10 pt-14 md:px-12 md:pt-10 lg:px-16">
+              <div className="mx-auto w-full max-w-3xl">
+                <h1 className="text-base font-semibold tracking-tight">library</h1>
+                <p className="mt-2 text-sm text-muted-foreground">Downloaded packs live in browser storage and remain available offline.</p>
 
-                      return (
-                        <div key={model.id} className={cn('rounded-xl border p-4', active && 'border-primary bg-primary/5')}>
-                          <div className="mb-2 flex items-center justify-between gap-2">
-                            <p className="font-semibold">{model.name}</p>
-                            {cached && <Badge variant="secondary">Cached</Badge>}
+                {installedPacks.length === 0 ? (
+                  <p className="mt-16 text-sm text-muted-foreground">No packs installed. Run setup again to add offline knowledge packs.</p>
+                ) : (
+                  <ul className="mt-10 divide-y divide-border/70 border-y border-border/70">
+                    {installedPacks.map(pack => (
+                      <li key={pack.id} className="py-5">
+                        <div className="flex items-start justify-between gap-4">
+                          <div className="min-w-0">
+                            <p className="text-[15px] font-medium text-foreground">{pack.title}</p>
+                            <p className="mt-1 text-sm text-muted-foreground">{pack.description}</p>
+                            <p className="mt-2 font-mono text-[11px] text-muted-foreground">
+                              {pack.sizeLabel} · {pack.docCount} docs
+                            </p>
                           </div>
-                          <p className="mb-3 text-sm text-muted-foreground">{model.description}</p>
-                          <div className="mb-3 flex gap-2">
-                            <Badge variant="outline">{model.sizeLabel}</Badge>
-                            <Badge variant="outline">{model.speed}</Badge>
-                          </div>
-                          <Button
-                            variant={active ? 'secondary' : 'default'}
-                            size="sm"
-                            disabled={isLoadingEngine}
-                            onClick={() => void loadModel(model.id)}
+                          <button
+                            type="button"
+                            onClick={() => void removeKnowledgePack(pack.id)}
+                            className="shrink-0 text-xs text-muted-foreground transition-colors hover:text-destructive"
                           >
-                            {active ? 'Active' : 'Load model'}
-                          </Button>
+                            remove
+                          </button>
                         </div>
-                      );
-                    })}
-                  </CardContent>
-                </Card>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            </section>
+          )}
 
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Storage</CardTitle>
-                    <CardDescription>
-                      Estimate local usage for models and knowledge resources.
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-3">
+          {view === 'settings' && (
+            <section className="h-screen overflow-y-auto px-5 pb-10 pt-14 md:px-12 md:pt-10 lg:px-16">
+              <div className="mx-auto w-full max-w-3xl">
+                <h1 className="text-base font-semibold tracking-tight">settings</h1>
+
+                <div className="mt-10 space-y-12">
+                  <section className="space-y-4">
+                    <h2 className="text-sm font-semibold">interface</h2>
+                    <div className="flex items-center justify-between border-b border-border/70 py-3">
+                      <div>
+                        <p className="text-sm">dark mode</p>
+                        <p className="text-xs text-muted-foreground">Default operating theme for low-light use.</p>
+                      </div>
+                      <Switch
+                        checked={theme === 'dark'}
+                        onCheckedChange={(checked) => setTheme(checked ? 'dark' : 'light')}
+                        aria-label="Toggle dark mode"
+                      />
+                    </div>
+                    <div className="flex items-center justify-between border-b border-border/70 py-3">
+                      <div>
+                        <p className="text-sm">use knowledge packs in chat</p>
+                        <p className="text-xs text-muted-foreground">When off, responses are model-only with no local pack retrieval.</p>
+                      </div>
+                      <Switch
+                        checked={useKnowledge}
+                        onCheckedChange={setUseKnowledge}
+                        aria-label="Toggle knowledge packs in chat"
+                      />
+                    </div>
+                    <div className="flex items-center justify-between border-b border-border/70 py-3">
+                      <div>
+                        <p className="text-sm">auto-load model on startup</p>
+                        <p className="text-xs text-muted-foreground">Load selected model automatically after launch.</p>
+                      </div>
+                      <Switch
+                        checked={appSettings.autoLoadModel}
+                        onCheckedChange={(checked) => {
+                          void saveSettings({ autoLoadModel: checked });
+                        }}
+                        aria-label="Toggle auto-load model"
+                      />
+                    </div>
+                  </section>
+
+                  <section className="space-y-4">
+                    <h2 className="text-sm font-semibold">models</h2>
+                    <p className="text-xs text-muted-foreground">
+                      {runtimeCompatibility.headline}. {runtimeCompatibility.detail}
+                    </p>
+                    {engineError && <p className="text-xs text-destructive">{engineError}</p>}
+
+                    <ul className="divide-y divide-border/70 border-y border-border/70">
+                      {availableModels.map(model => {
+                        const active = model.id === (currentModelId ?? appSettings.selectedModelId);
+                        const cached = cachedModelStatus[model.id];
+
+                        return (
+                          <li key={model.id} className={cn('py-4', active && 'bg-foreground/[0.03]')}>
+                            <div className="flex items-start justify-between gap-4">
+                              <div className="min-w-0">
+                                <p className="text-sm font-medium">{model.name}</p>
+                                <p className="mt-1 text-sm text-muted-foreground">{model.description}</p>
+                                <p className="mt-2 font-mono text-[11px] text-muted-foreground">
+                                  {model.id} · {model.sizeLabel} · {model.speed} · {model.quality}
+                                  {cached ? ' · cached' : ''}
+                                </p>
+                              </div>
+                              <Button
+                                variant={active ? 'secondary' : 'outline'}
+                                size="sm"
+                                disabled={isLoadingEngine}
+                                onClick={() => void loadModel(model.id)}
+                                className="shrink-0"
+                              >
+                                {active ? 'active' : 'load'}
+                              </Button>
+                            </div>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </section>
+
+                  <section className="space-y-4">
+                    <h2 className="text-sm font-semibold">storage</h2>
                     <Button
                       variant="outline"
+                      size="sm"
                       disabled={loadingStorage}
                       onClick={() => {
                         setLoadingStorage(true);
@@ -487,39 +357,29 @@ export default function Index() {
                           .finally(() => setLoadingStorage(false));
                       }}
                     >
-                      <DownloadCloud className="mr-2 size-4" />
-                      Check storage usage
+                      {loadingStorage ? 'checking…' : 'check local usage'}
                     </Button>
 
                     {storageUsage && (
-                      <div className="rounded-xl border bg-muted/20 p-4 text-sm">
-                        <p>Used: {formatBytes(storageUsage.usedBytes)}</p>
-                        <p>Quota: {formatBytes(storageUsage.quotaBytes)}</p>
-                      </div>
+                      <p className="font-mono text-[12px] text-muted-foreground">
+                        used {formatBytes(storageUsage.usedBytes)} / quota {formatBytes(storageUsage.quotaBytes)}
+                      </p>
                     )}
+                  </section>
 
-                    <div className="flex items-center justify-between rounded-xl border p-4">
-                      <div>
-                        <p className="font-medium">Auto-load model on startup</p>
-                        <p className="text-xs text-muted-foreground">Disabled saves memory until you manually load.</p>
-                      </div>
-                      <Switch
-                        checked={appSettings.autoLoadModel}
-                        onCheckedChange={(checked) => {
-                          void saveSettings({ autoLoadModel: checked });
-                        }}
-                      />
-                    </div>
+                  <section className="space-y-4">
+                    <h2 className="text-sm font-semibold">reset</h2>
+                    <p className="text-xs text-muted-foreground">Remove local model cache, downloaded packs, and app settings from this browser.</p>
 
                     <AlertDialog>
                       <AlertDialogTrigger asChild>
-                        <Button variant="destructive">Reset all local data</Button>
+                        <Button variant="destructive" size="sm">reset all local data</Button>
                       </AlertDialogTrigger>
                       <AlertDialogContent>
                         <AlertDialogHeader>
                           <AlertDialogTitle>Reset Citadel Chat?</AlertDialogTitle>
                           <AlertDialogDescription>
-                            This removes local model caches, downloaded packs, and saved settings from this browser.
+                            This clears all model caches, knowledge packs, and saved settings from this browser.
                           </AlertDialogDescription>
                         </AlertDialogHeader>
                         <AlertDialogFooter>
@@ -534,11 +394,25 @@ export default function Index() {
                         </AlertDialogFooter>
                       </AlertDialogContent>
                     </AlertDialog>
-                  </CardContent>
-                </Card>
+                  </section>
+                </div>
+
+                <footer className="mt-16 space-y-2 pb-4 text-xs text-muted-foreground/80">
+                  <p>
+                    curated by{' '}
+                    <a href="https://odell.xyz" target="_blank" rel="noreferrer" className="underline underline-offset-4">
+                      ODELL
+                    </a>
+                  </p>
+                  <p>
+                    <a href="https://shakespeare.diy" target="_blank" rel="noreferrer" className="underline underline-offset-4">
+                      Vibed with Shakespeare
+                    </a>
+                  </p>
+                </footer>
               </div>
-            )}
-          </div>
+            </section>
+          )}
         </main>
       </div>
     </div>
@@ -556,7 +430,7 @@ export default function Index() {
         {
           id: crypto.randomUUID(),
           role: 'assistant',
-          content: 'Local model is not ready yet. Please load a model in Settings.',
+          content: 'Local model is not ready yet. Load a model in settings to continue.',
           createdAt: Date.now(),
         },
       ]);
@@ -621,52 +495,48 @@ export default function Index() {
   }
 }
 
-function SidebarButton({
-  active,
-  icon: Icon,
-  onClick,
-  children,
+function NavigationRail({
+  view,
+  onViewChange,
 }: {
-  active: boolean;
-  icon: ComponentType<{ className?: string }>;
-  onClick: () => void;
-  children: ReactNode;
+  view: AppView;
+  onViewChange: (view: AppView) => void;
 }) {
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={cn(
-        'flex w-full items-center gap-3 rounded-xl px-3 py-2 text-left text-sm transition-colors',
-        active ? 'bg-primary text-primary-foreground shadow-sm' : 'hover:bg-muted',
-      )}
-    >
-      <Icon className="size-4" />
-      {children}
-    </button>
-  );
-}
+    <div className="flex h-full flex-col items-center py-4">
+      <div className="flex flex-col gap-2">
+        {NAV_ITEMS.map(item => {
+          const Icon = item.icon;
+          const active = view === item.id;
 
-function StatusRow({
-  label,
-  value,
-  icon: Icon,
-  tone,
-}: {
-  label: string;
-  value: string;
-  icon: ComponentType<{ className?: string }>;
-  tone: 'ok' | 'warn';
-}) {
-  return (
-    <div className="flex items-center justify-between text-xs">
-      <div className="flex items-center gap-2 text-muted-foreground">
-        <Icon className="size-3.5" />
-        <span>{label}</span>
+          return (
+            <button
+              key={item.id}
+              type="button"
+              onClick={() => onViewChange(item.id)}
+              className={cn(
+                'rail-icon-transition relative flex h-10 w-10 items-center justify-center rounded-md text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-foreground',
+                active && 'text-primary',
+              )}
+              aria-label={item.label}
+              title={item.label}
+            >
+              {active && <span className="absolute left-0 top-1/2 h-6 w-0.5 -translate-y-1/2 rounded-full bg-primary" aria-hidden />}
+              <Icon className="size-4" />
+            </button>
+          );
+        })}
       </div>
-      <span className={cn('font-medium', tone === 'ok' ? 'text-primary' : 'text-amber-500')}>
-        {value}
-      </span>
+
+      <a
+        href="https://citadelwire.com"
+        target="_blank"
+        rel="noreferrer"
+        aria-label="Citadel"
+        className="mt-auto inline-flex h-8 w-8 items-center justify-center rounded-full border border-sidebar-border/80 bg-sidebar-accent/40 hover:border-primary/60"
+      >
+        <img src="/citadel-logo.png" alt="Citadel" className="h-6 w-6 rounded-full object-cover" />
+      </a>
     </div>
   );
 }
@@ -675,21 +545,13 @@ function MessageBubble({ message }: { message: CitadelMessage }) {
   const isUser = message.role === 'user';
 
   return (
-    <div className={cn('flex', isUser ? 'justify-end' : 'justify-start')}>
-      <div
-        className={cn(
-          'max-w-[90%] rounded-2xl border p-4 sm:max-w-[80%]',
-          isUser ? 'bg-primary text-primary-foreground' : 'bg-card',
-        )}
-      >
-        <p className={cn('mb-2 text-xs font-semibold uppercase tracking-wide', isUser ? 'text-primary-foreground/80' : 'text-muted-foreground')}>
-          {isUser ? 'You' : 'Citadel'}
-        </p>
-        <div className={cn('whitespace-pre-wrap text-sm leading-relaxed', !isUser && 'prose-citadel')}>
-          {message.content || <span className="typing-cursor">Thinking</span>}
+    <div className={cn('animate-message-in flex', isUser ? 'justify-end' : 'justify-start')}>
+      <div className={cn('max-w-[min(72ch,88%)]', isUser && 'rounded-xl bg-foreground/[0.05] px-4 py-3')}>
+        <div className={cn('whitespace-pre-wrap break-words text-[15px] leading-7', !isUser && 'prose-citadel')}>
+          {message.content || <span className="typing-cursor">thinking</span>}
         </div>
         {message.runtimeStats && (
-          <p className="mt-2 text-[11px] text-muted-foreground">{message.runtimeStats}</p>
+          <p className="mt-2 font-mono text-[11px] text-muted-foreground">{message.runtimeStats}</p>
         )}
       </div>
     </div>
