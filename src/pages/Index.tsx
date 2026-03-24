@@ -17,6 +17,7 @@ import { useSeoMeta } from '@unhead/react';
 import {
   DEFAULT_ASSISTANT_SYSTEM_PROMPT,
   useCitadel,
+  type BrowserKind,
   type CitadelMessage,
 } from '@/contexts/CitadelContext';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
@@ -71,6 +72,13 @@ interface SavedChatSession {
   useKnowledge: boolean;
 }
 
+type DeviceClass = 'mobile' | 'desktop';
+
+interface InstallGuide {
+  title: string;
+  steps: string[];
+}
+
 const MAX_CHAT_HISTORY = 50;
 
 const NAV_ITEMS: NavItem[] = [
@@ -113,6 +121,72 @@ function formatSessionTime(timestamp: number): string {
     hour: '2-digit',
     minute: '2-digit',
   });
+}
+
+function getInstallGuidance(device: DeviceClass, browser: BrowserKind): InstallGuide {
+  if (device === 'mobile') {
+    if (browser === 'safari') {
+      return {
+        title: 'iPhone / iPad (Safari)',
+        steps: [
+          'Tap the Share button in Safari.',
+          'Scroll down and tap Add to Home Screen.',
+          'Tap Add to install Citadel Chat on your home screen.',
+        ],
+      };
+    }
+
+    if (browser === 'chrome' || browser === 'edge' || browser === 'opera') {
+      return {
+        title: 'Android (browser menu)',
+        steps: [
+          'Open the browser menu (⋮ or …).',
+          'Tap Install app or Add to Home screen.',
+          'Confirm Install to save Citadel Chat offline as an app.',
+        ],
+      };
+    }
+
+    return {
+      title: 'Mobile browser',
+      steps: [
+        'Open your browser menu.',
+        'Choose Install app or Add to Home screen.',
+        'Confirm to install Citadel Chat for offline use.',
+      ],
+    };
+  }
+
+  if (browser === 'chrome' || browser === 'edge' || browser === 'opera') {
+    return {
+      title: 'Desktop install',
+      steps: [
+        'Look for the install icon in the address bar.',
+        'Or open the browser menu and choose Install Citadel Chat.',
+        'Confirm Install to launch it as a standalone app.',
+      ],
+    };
+  }
+
+  if (browser === 'safari') {
+    return {
+      title: 'Desktop Safari',
+      steps: [
+        'Open File in the Safari menu bar.',
+        'Choose Add to Dock.',
+        'Confirm to save Citadel Chat as a web app for offline access.',
+      ],
+    };
+  }
+
+  return {
+    title: 'Desktop browser',
+    steps: [
+      'Open your browser menu.',
+      'Find Install app, Add to apps, or Create shortcut.',
+      'Enable opening as an app and confirm installation.',
+    ],
+  };
 }
 
 export default function Index() {
@@ -270,6 +344,13 @@ export default function Index() {
     () => filterModelsForDevice(availableModels, isMobile),
     [availableModels, isMobile],
   );
+
+  const deviceClass: DeviceClass = isMobile ? 'mobile' : 'desktop';
+  const installGuide = useMemo(
+    () => getInstallGuidance(deviceClass, runtimeCompatibility.browser),
+    [deviceClass, runtimeCompatibility.browser],
+  );
+  const browserLabel = runtimeCompatibility.browser === 'other' ? 'unknown' : runtimeCompatibility.browser;
 
   const normalizedSystemPromptDraft = systemPromptDraft.trim();
   const normalizedSavedSystemPrompt = appSettings.systemPrompt.trim();
@@ -523,6 +604,21 @@ export default function Index() {
                     if no prompt appears, use your browser menu and choose install app or add to home screen.
                   </p>
                 )}
+
+                {!isPwaInstalled && (
+                  <div className="space-y-3 rounded-lg border border-border/70 bg-foreground/[0.02] px-4 py-3">
+                    <p className="text-xs text-muted-foreground">
+                      detected: {deviceClass} · {browserLabel}
+                    </p>
+                    <p className="text-sm font-medium">{installGuide.title}</p>
+                    <ol className="list-decimal space-y-1 pl-5 text-xs text-muted-foreground">
+                      {installGuide.steps.map((step) => (
+                        <li key={step}>{step}</li>
+                      ))}
+                    </ol>
+                  </div>
+                )}
+
                 <Button
                   variant="ghost"
                   size="sm"
