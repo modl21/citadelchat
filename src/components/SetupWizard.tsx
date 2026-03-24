@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 
 import { useCitadel } from '@/contexts/CitadelContext';
 import { useIsMobile } from '@/hooks/useIsMobile';
-import { KNOWLEDGE_PACKS, KNOWLEDGE_PRESETS } from '@/lib/knowledge-packs';
+import { KNOWLEDGE_PACKS } from '@/lib/knowledge-packs';
 import { filterModelsForDevice, formatBytes } from '@/lib/webllm-models';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -40,8 +40,7 @@ export function SetupWizard({ onComplete }: SetupWizardProps) {
   );
 
   const defaultPackIds = useMemo(
-    () => KNOWLEDGE_PRESETS.find(preset => preset.id === 'starter')?.packIds
-      ?? KNOWLEDGE_PACKS.filter(pack => pack.recommended).map(pack => pack.id),
+    () => KNOWLEDGE_PACKS.map(pack => pack.id),
     [],
   );
 
