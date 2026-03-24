@@ -132,7 +132,7 @@ export function SetupWizard({ onComplete }: SetupWizardProps) {
     || runtimeCompatibility.status === 'unsupported';
 
   return (
-    <div className="relative min-h-screen bg-background text-foreground">
+    <div className="relative min-h-screen min-h-[100dvh] bg-background text-foreground">
       {(isInstalling || isLoadingEngine) && (
         <div className="fixed inset-x-0 top-0 z-50 h-px bg-border/60">
           <div
@@ -142,7 +142,7 @@ export function SetupWizard({ onComplete }: SetupWizardProps) {
         </div>
       )}
 
-      <div className="mx-auto flex min-h-screen w-full max-w-3xl flex-col px-6 pb-8 pt-10 md:px-10 md:pt-14">
+      <div className="mx-auto flex min-h-screen min-h-[100dvh] w-full max-w-3xl flex-col px-6 pb-[max(2rem,env(safe-area-inset-bottom)+4.5rem)] pt-10 md:px-10 md:pt-14">
         <div className="mb-6 space-y-3">
           <div className="flex items-center gap-3">
             <a
@@ -300,7 +300,7 @@ export function SetupWizard({ onComplete }: SetupWizardProps) {
           )}
         </div>
 
-        <div className="mt-10 flex items-center justify-between">
+        <div className="sticky bottom-0 z-20 mt-10 flex items-center justify-between border-t border-border/70 bg-background/95 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-4 backdrop-blur supports-[backdrop-filter]:bg-background/85">
           <Button
             type="button"
             variant="ghost"
