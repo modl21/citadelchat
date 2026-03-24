@@ -185,7 +185,7 @@ export default function Index() {
               className="inline-flex items-center gap-2 rounded-full border border-border/70 px-2 py-1 text-[11px] text-muted-foreground transition-colors hover:border-primary hover:text-foreground"
             >
               <img src="/odell-badge.jpg" alt="ODELL" className="h-5 w-5 rounded-full object-cover" />
-              <span className="hidden sm:inline">curated by ODELL</span>
+              <span>curated by ODELL</span>
             </a>
           </header>
 
