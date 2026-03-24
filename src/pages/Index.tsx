@@ -1,10 +1,21 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Download, HardDrive, Menu, MessageSquare, RefreshCw, Send, Settings } from 'lucide-react';
+import {
+  Clock3,
+  Download,
+  HardDrive,
+  MessageSquare,
+  Plus,
+  RefreshCw,
+  Send,
+  Settings,
+  Trash2,
+} from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 
 import { useSeoMeta } from '@unhead/react';
 
 import { useCitadel, type CitadelMessage } from '@/contexts/CitadelContext';
+import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { toast } from '@/hooks/useToast';
 import { useTheme } from '@/hooks/useTheme';
 import { SetupWizard } from '@/components/SetupWizard';
@@ -14,11 +25,6 @@ import { formatBytes } from '@/lib/webllm-models';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
-import {
-  Sheet,
-  SheetContent,
-  SheetTrigger,
-} from '@/components/ui/sheet';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -43,7 +49,7 @@ const INITIAL_MESSAGE: CitadelMessage = {
   createdAt: Date.now(),
 };
 
-type AppView = 'chat' | 'library' | 'settings';
+type AppView = 'chat' | 'library' | 'history' | 'settings';
 
 interface NavItem {
   id: AppView;
@@ -51,11 +57,58 @@ interface NavItem {
   icon: LucideIcon;
 }
 
+interface SavedChatSession {
+  id: string;
+  title: string;
+  updatedAt: number;
+  messages: CitadelMessage[];
+  useKnowledge: boolean;
+}
+
+const MAX_CHAT_HISTORY = 50;
+
 const NAV_ITEMS: NavItem[] = [
-  { id: 'chat', label: 'Chat', icon: MessageSquare },
-  { id: 'library', label: 'Library', icon: HardDrive },
-  { id: 'settings', label: 'Settings', icon: Settings },
+  { id: 'chat', label: 'chat', icon: MessageSquare },
+  { id: 'library', label: 'library', icon: HardDrive },
+  { id: 'history', label: 'history', icon: Clock3 },
+  { id: 'settings', label: 'settings', icon: Settings },
 ];
+
+function hasMeaningfulMessages(messages: CitadelMessage[]): boolean {
+  const nonWelcome = messages.filter(message => message.id !== INITIAL_MESSAGE.id);
+  return nonWelcome.some(message => message.content.trim().length > 0);
+}
+
+function buildSessionTitle(messages: CitadelMessage[]): string {
+  const firstUserMessage = messages.find(message => message.role === 'user' && message.content.trim().length > 0);
+  if (!firstUserMessage) {
+    return 'untitled chat';
+  }
+
+  const compact = firstUserMessage.content.trim().replace(/\s+/g, ' ');
+  if (compact.length <= 72) {
+    return compact;
+  }
+
+  return `${compact.slice(0, 72)}…`;
+}
+
+function upsertSession(sessions: SavedChatSession[], entry: SavedChatSession): SavedChatSession[] {
+  const merged = [entry, ...sessions.filter(session => session.id !== entry.id)]
+    .sort((a, b) => b.updatedAt - a.updatedAt);
+
+  return merged.slice(0, MAX_CHAT_HISTORY);
+}
+
+function formatSessionTime(timestamp: number): string {
+  return new Date(timestamp).toLocaleString([], {
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+}
+
 export default function Index() {
   useSeoMeta({
     title: 'Citadel Chat',
@@ -70,6 +123,7 @@ export default function Index() {
     downloadedPackIds,
     engineError,
     getStorageInfo,
+    installKnowledgePack,
     isEngineReady,
     isLoadingEngine,
     loadModel,
@@ -85,15 +139,21 @@ export default function Index() {
 
   const [setupCompletedState, setSetupCompletedState] = useState(appSettings.setupComplete);
   const [view, setView] = useState<AppView>('chat');
-  const [mobileRailOpen, setMobileRailOpen] = useState(false);
 
   const [messages, setMessages] = useState<CitadelMessage[]>([INITIAL_MESSAGE]);
   const [prompt, setPrompt] = useState('');
   const [isSending, setIsSending] = useState(false);
   const [useKnowledge, setUseKnowledge] = useState(true);
 
+  const [chatHistory, setChatHistory] = useLocalStorage<SavedChatSession[]>('citadel:chat-history', []);
+  const [activeChatId, setActiveChatId] = useState<string | null>(null);
+
+  const [installingPackIds, setInstallingPackIds] = useState<string[]>([]);
+  const [isInstallingRecommended, setIsInstallingRecommended] = useState(false);
+
   const [storageUsage, setStorageUsage] = useState<{ usedBytes: number; quotaBytes: number } | null>(null);
   const [loadingStorage, setLoadingStorage] = useState(false);
+
   const [deferredInstallPrompt, setDeferredInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [isInstallingPwa, setIsInstallingPwa] = useState(false);
   const [isPwaInstalled, setIsPwaInstalled] = useState(
@@ -118,6 +178,28 @@ export default function Index() {
   useEffect(() => {
     messageEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
   }, [messages]);
+
+  useEffect(() => {
+    if (!activeChatId || isSending) {
+      return;
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      const nextSession: SavedChatSession = {
+        id: activeChatId,
+        title: buildSessionTitle(messages),
+        updatedAt: Date.now(),
+        messages,
+        useKnowledge,
+      };
+
+      setChatHistory(current => upsertSession(current, nextSession));
+    }, 400);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
+  }, [activeChatId, isSending, messages, setChatHistory, useKnowledge]);
 
   useEffect(() => {
     if (typeof window === 'undefined') {
@@ -161,6 +243,16 @@ export default function Index() {
     [downloadedPackIds],
   );
 
+  const availablePacks = useMemo(
+    () => KNOWLEDGE_PACKS.filter(pack => !downloadedPackIds.includes(pack.id)),
+    [downloadedPackIds],
+  );
+
+  const recommendedAvailablePacks = useMemo(
+    () => availablePacks.filter(pack => pack.recommended),
+    [availablePacks],
+  );
+
   if (!setupIsComplete) {
     return <SetupWizard onComplete={() => setSetupCompletedState(true)} />;
   }
@@ -176,111 +268,106 @@ export default function Index() {
         </div>
       )}
 
-      <div className="flex min-h-screen">
-        <aside className="hidden w-16 shrink-0 border-r border-sidebar-border/80 bg-sidebar md:block">
-          <NavigationRail
-            view={view}
-            onViewChange={setView}
-          />
-        </aside>
+      <main className="mx-auto min-h-screen w-full max-w-5xl px-5 pb-24 pt-6 md:px-8 md:pt-8">
+        {view === 'chat' && (
+          <section className="flex min-h-[calc(100vh-9rem)] flex-col">
+            <div className="mb-4 flex items-center justify-between gap-3">
+              <h1 className="text-base font-semibold tracking-tight">chat</h1>
+              <Button variant="outline" size="sm" onClick={() => void handleStartNewChat()}>
+                <Plus className="mr-2 size-4" />
+                new chat
+              </Button>
+            </div>
 
-        <main className="relative flex min-h-screen flex-1 flex-col">
-          <div className="absolute left-3 top-3 z-20 md:hidden">
-            <Sheet open={mobileRailOpen} onOpenChange={setMobileRailOpen}>
-              <SheetTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-9 w-9 rounded-md border border-border/70 bg-background/85 text-muted-foreground"
-                  aria-label="Open navigation"
-                >
-                  <Menu className="size-4" />
-                </Button>
-              </SheetTrigger>
-              <SheetContent side="left" className="w-full max-w-none border-r border-border/80 bg-sidebar p-0">
-                <NavigationRail
-                  view={view}
-                  onViewChange={(nextView) => {
-                    setView(nextView);
-                    setMobileRailOpen(false);
+            <div className="flex-1 overflow-y-auto">
+              <div className="space-y-8 pb-6">
+                {messages.map(message => (
+                  <MessageBubble key={message.id} message={message} />
+                ))}
+                <div ref={messageEndRef} />
+              </div>
+            </div>
+
+            <form
+              className="pt-2"
+              onSubmit={(event) => {
+                event.preventDefault();
+                void handleSend();
+              }}
+            >
+              {engineError && (
+                <p className="mb-2 text-xs text-destructive">{engineError}</p>
+              )}
+
+              {isLoadingEngine && (
+                <p className="mb-2 text-xs font-mono text-muted-foreground">{loadProgress.text}</p>
+              )}
+
+              <div className="relative">
+                <textarea
+                  ref={composerRef}
+                  value={prompt}
+                  onChange={(event) => setPrompt(event.target.value)}
+                  placeholder={isEngineReady ? 'ask anything' : 'load a model in settings to begin'}
+                  disabled={!isEngineReady || isSending}
+                  rows={1}
+                  className="w-full resize-none overflow-y-auto border-0 border-b border-border bg-transparent px-0 py-3 pr-10 text-[15px] leading-7 text-foreground outline-none placeholder:text-muted-foreground/75 focus:border-primary disabled:cursor-not-allowed disabled:opacity-55"
+                  onKeyDown={(event) => {
+                    if (event.key === 'Enter' && !event.shiftKey) {
+                      event.preventDefault();
+                      void handleSend();
+                    }
                   }}
                 />
-              </SheetContent>
-            </Sheet>
-          </div>
 
-          {view === 'chat' && (
-            <section className="flex min-h-0 flex-1 flex-col px-5 pb-6 pt-14 md:px-12 md:pb-8 md:pt-8 lg:px-16">
-              <div className="mx-auto flex w-full max-w-4xl flex-1 min-h-0 flex-col">
-                <div className="flex-1 overflow-y-auto">
-                  <div className="space-y-8 pb-6">
-                    {messages.map(message => (
-                      <MessageBubble key={message.id} message={message} />
-                    ))}
-                    <div ref={messageEndRef} />
-                  </div>
-                </div>
-
-                <form
-                  className="pt-3"
-                  onSubmit={(event) => {
-                    event.preventDefault();
-                    void handleSend();
-                  }}
+                <button
+                  type="submit"
+                  disabled={!prompt.trim() || isSending || !isEngineReady}
+                  aria-label="Send"
+                  className={cn(
+                    'absolute bottom-2 right-0 inline-flex h-7 w-7 items-center justify-center rounded-full text-primary transition-opacity duration-100 ease-out disabled:pointer-events-none disabled:text-muted-foreground/40',
+                    prompt.trim() ? 'opacity-100' : 'pointer-events-none opacity-0',
+                  )}
                 >
-                  {engineError && (
-                    <p className="mb-2 text-xs text-destructive">{engineError}</p>
-                  )}
-
-                  {isLoadingEngine && (
-                    <p className="mb-2 text-xs font-mono text-muted-foreground">{loadProgress.text}</p>
-                  )}
-
-                  <div className="relative">
-                    <textarea
-                      ref={composerRef}
-                      value={prompt}
-                      onChange={(event) => setPrompt(event.target.value)}
-                      placeholder={isEngineReady ? 'ask anything' : 'load a model in settings to begin'}
-                      disabled={!isEngineReady || isSending}
-                      rows={1}
-                      className="w-full resize-none overflow-y-auto border-0 border-b border-border bg-transparent px-0 py-3 pr-10 text-[15px] leading-7 text-foreground outline-none placeholder:text-muted-foreground/75 focus:border-primary disabled:cursor-not-allowed disabled:opacity-55"
-                      onKeyDown={(event) => {
-                        if (event.key === 'Enter' && !event.shiftKey) {
-                          event.preventDefault();
-                          void handleSend();
-                        }
-                      }}
-                    />
-
-                    <button
-                      type="submit"
-                      disabled={!prompt.trim() || isSending || !isEngineReady}
-                      aria-label="Send"
-                      className={cn(
-                        'absolute bottom-2 right-0 inline-flex h-7 w-7 items-center justify-center rounded-full text-primary transition-opacity duration-100 ease-out disabled:pointer-events-none disabled:text-muted-foreground/40',
-                        prompt.trim() ? 'opacity-100' : 'pointer-events-none opacity-0',
-                      )}
-                    >
-                      <Send className="size-4" />
-                    </button>
-                  </div>
-                </form>
+                  <Send className="size-4" />
+                </button>
               </div>
-            </section>
-          )}
+            </form>
+          </section>
+        )}
 
-          {view === 'library' && (
-            <section className="min-h-0 flex-1 overflow-y-auto px-5 pb-10 pt-4 md:px-12 md:pt-6 lg:px-16">
-              <div className="mx-auto w-full max-w-3xl">
-                <h1 className="text-base font-semibold tracking-tight">library</h1>
-                <p className="mt-2 text-sm text-muted-foreground">Downloaded packs live in browser storage and remain available offline.</p>
+        {view === 'library' && (
+          <section className="space-y-10">
+            <div>
+              <h1 className="text-base font-semibold tracking-tight">library</h1>
+              <p className="mt-2 text-sm text-muted-foreground">manage downloaded packs and install additional offline knowledge quickly.</p>
+            </div>
 
-                {installedPacks.length === 0 ? (
-                  <p className="mt-16 text-sm text-muted-foreground">No packs installed. Run setup again to add offline knowledge packs.</p>
-                ) : (
-                  <ul className="mt-10 divide-y divide-border/70 border-y border-border/70">
-                    {installedPacks.map(pack => (
+            <section className="space-y-4">
+              <div className="flex items-center justify-between gap-3">
+                <h2 className="text-sm font-semibold">available to download</h2>
+                {recommendedAvailablePacks.length > 0 && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={isInstallingRecommended}
+                    onClick={() => {
+                      void handleInstallRecommendedPacks();
+                    }}
+                  >
+                    {isInstallingRecommended ? 'downloading…' : 'download recommended'}
+                  </Button>
+                )}
+              </div>
+
+              {availablePacks.length === 0 ? (
+                <p className="text-sm text-muted-foreground">all bundled packs are already installed.</p>
+              ) : (
+                <ul className="divide-y divide-border/70 border-y border-border/70">
+                  {availablePacks.map(pack => {
+                    const isInstallingThisPack = installingPackIds.includes(pack.id);
+
+                    return (
                       <li key={pack.id} className="py-5">
                         <div className="flex items-start justify-between gap-4">
                           <div className="min-w-0">
@@ -290,208 +377,395 @@ export default function Index() {
                               {pack.sizeLabel} · {pack.docCount} docs
                             </p>
                           </div>
-                          <button
-                            type="button"
-                            onClick={() => void removeKnowledgePack(pack.id)}
-                            className="shrink-0 text-xs text-muted-foreground transition-colors hover:text-destructive"
-                          >
-                            remove
-                          </button>
-                        </div>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </div>
-            </section>
-          )}
-
-          {view === 'settings' && (
-            <section className="min-h-0 flex-1 overflow-y-auto px-5 pb-10 pt-4 md:px-12 md:pt-6 lg:px-16">
-              <div className="mx-auto w-full max-w-3xl">
-                <h1 className="text-base font-semibold tracking-tight">settings</h1>
-
-                <div className="mt-10 space-y-12">
-                  <section className="space-y-4">
-                    <h2 className="text-sm font-semibold">install app</h2>
-                    <p className="text-xs text-muted-foreground">
-                      install citadel chat on desktop or mobile as a standalone offline-ready app.
-                    </p>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      disabled={isInstallingPwa || isPwaInstalled}
-                      onClick={() => {
-                        void handleInstallPwa();
-                      }}
-                    >
-                      <Download className="mr-2 size-4" />
-                      {isPwaInstalled ? 'already installed' : isInstallingPwa ? 'opening install prompt…' : 'install citadel chat'}
-                    </Button>
-                    {!deferredInstallPrompt && !isPwaInstalled && (
-                      <p className="text-[11px] text-muted-foreground">
-                        if no prompt appears, use your browser menu and choose install app or add to home screen.
-                      </p>
-                    )}
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      disabled={isRefreshingOfflineCache}
-                      onClick={() => {
-                        void handleRefreshOfflineCache();
-                      }}
-                    >
-                      <RefreshCw className={cn('mr-2 size-4', isRefreshingOfflineCache && 'animate-spin')} />
-                      {isRefreshingOfflineCache ? 'refreshing offline cache…' : 'refresh offline cache'}
-                    </Button>
-                    <p className="text-[11px] text-muted-foreground">
-                      refresh offline cache after updates to keep this install fully usable without network.
-                    </p>
-                  </section>
-
-                  <section className="space-y-4">
-                    <h2 className="text-sm font-semibold">interface</h2>
-                    <div className="flex items-center justify-between border-b border-border/70 py-3">
-                      <div>
-                        <p className="text-sm">dark mode</p>
-                        <p className="text-xs text-muted-foreground">Default operating theme for low-light use.</p>
-                      </div>
-                      <Switch
-                        checked={theme === 'dark'}
-                        onCheckedChange={(checked) => setTheme(checked ? 'dark' : 'light')}
-                        aria-label="Toggle dark mode"
-                      />
-                    </div>
-                    <div className="flex items-center justify-between border-b border-border/70 py-3">
-                      <div>
-                        <p className="text-sm">use knowledge packs in chat</p>
-                        <p className="text-xs text-muted-foreground">When off, responses are model-only with no local pack retrieval.</p>
-                      </div>
-                      <Switch
-                        checked={useKnowledge}
-                        onCheckedChange={setUseKnowledge}
-                        aria-label="Toggle knowledge packs in chat"
-                      />
-                    </div>
-                    <div className="flex items-center justify-between border-b border-border/70 py-3">
-                      <div>
-                        <p className="text-sm">auto-load model on startup</p>
-                        <p className="text-xs text-muted-foreground">Load selected model automatically after launch.</p>
-                      </div>
-                      <Switch
-                        checked={appSettings.autoLoadModel}
-                        onCheckedChange={(checked) => {
-                          void saveSettings({ autoLoadModel: checked });
-                        }}
-                        aria-label="Toggle auto-load model"
-                      />
-                    </div>
-                  </section>
-
-                  <section className="space-y-4">
-                    <h2 className="text-sm font-semibold">models</h2>
-                    <p className="text-xs text-muted-foreground">
-                      {runtimeCompatibility.headline}. {runtimeCompatibility.detail}
-                    </p>
-                    {engineError && <p className="text-xs text-destructive">{engineError}</p>}
-
-                    <ul className="divide-y divide-border/70 border-y border-border/70">
-                      {availableModels.map(model => {
-                        const active = model.id === (currentModelId ?? appSettings.selectedModelId);
-                        const cached = cachedModelStatus[model.id];
-
-                        return (
-                          <li key={model.id} className={cn('py-4', active && 'bg-foreground/[0.03]')}>
-                            <div className="flex items-start justify-between gap-4">
-                              <div className="min-w-0">
-                                <p className="text-sm font-medium">{model.name}</p>
-                                <p className="mt-1 text-sm text-muted-foreground">{model.description}</p>
-                                <p className="mt-2 font-mono text-[11px] text-muted-foreground">
-                                  {model.id} · {model.sizeLabel} · {model.speed} · {model.quality}
-                                  {cached ? ' · cached' : ''}
-                                </p>
-                              </div>
-                              <Button
-                                variant={active ? 'secondary' : 'outline'}
-                                size="sm"
-                                disabled={isLoadingEngine}
-                                onClick={() => void loadModel(model.id)}
-                                className="shrink-0"
-                              >
-                                {active ? 'active' : 'load'}
-                              </Button>
-                            </div>
-                          </li>
-                        );
-                      })}
-                    </ul>
-                  </section>
-
-                  <section className="space-y-4">
-                    <h2 className="text-sm font-semibold">storage</h2>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      disabled={loadingStorage}
-                      onClick={() => {
-                        setLoadingStorage(true);
-                        void getStorageInfo()
-                          .then(setStorageUsage)
-                          .finally(() => setLoadingStorage(false));
-                      }}
-                    >
-                      {loadingStorage ? 'checking…' : 'check local usage'}
-                    </Button>
-
-                    {storageUsage && (
-                      <p className="font-mono text-[12px] text-muted-foreground">
-                        used {formatBytes(storageUsage.usedBytes)} / quota {formatBytes(storageUsage.quotaBytes)}
-                      </p>
-                    )}
-                  </section>
-
-                  <section className="space-y-4">
-                    <h2 className="text-sm font-semibold">reset</h2>
-                    <p className="text-xs text-muted-foreground">Remove local model cache, downloaded packs, and app settings from this browser.</p>
-
-                    <AlertDialog>
-                      <AlertDialogTrigger asChild>
-                        <Button variant="destructive" size="sm">reset all local data</Button>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent>
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>Reset Citadel Chat?</AlertDialogTitle>
-                          <AlertDialogDescription>
-                            This clears all model caches, knowledge packs, and saved settings from this browser.
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel>Cancel</AlertDialogCancel>
-                          <AlertDialogAction
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            disabled={isInstallingThisPack}
                             onClick={() => {
-                              void resetApplicationData();
+                              void handleInstallPack(pack.id);
                             }}
                           >
-                            Reset
-                          </AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
-                  </section>
-                </div>
-
-                <footer className="mt-16 pb-4 text-xs text-muted-foreground/80">
-                  <a href="https://shakespeare.diy" target="_blank" rel="noreferrer" className="underline underline-offset-4">
-                    Vibed with Shakespeare
-                  </a>
-                </footer>
-              </div>
+                            {isInstallingThisPack ? 'downloading…' : 'download'}
+                          </Button>
+                        </div>
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
             </section>
-          )}
-        </main>
-      </div>
+
+            <section className="space-y-4">
+              <h2 className="text-sm font-semibold">installed packs</h2>
+
+              {installedPacks.length === 0 ? (
+                <p className="text-sm text-muted-foreground">no packs installed yet.</p>
+              ) : (
+                <ul className="divide-y divide-border/70 border-y border-border/70">
+                  {installedPacks.map(pack => (
+                    <li key={pack.id} className="py-5">
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="min-w-0">
+                          <p className="text-[15px] font-medium text-foreground">{pack.title}</p>
+                          <p className="mt-1 text-sm text-muted-foreground">{pack.description}</p>
+                          <p className="mt-2 font-mono text-[11px] text-muted-foreground">
+                            {pack.sizeLabel} · {pack.docCount} docs
+                          </p>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => void removeKnowledgePack(pack.id)}
+                          className="shrink-0 text-xs text-muted-foreground transition-colors hover:text-destructive"
+                        >
+                          remove
+                        </button>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </section>
+          </section>
+        )}
+
+        {view === 'history' && (
+          <section className="space-y-6">
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <h1 className="text-base font-semibold tracking-tight">chat history</h1>
+                <p className="mt-2 text-sm text-muted-foreground">select any saved conversation to continue where you left off.</p>
+              </div>
+              <Button variant="outline" size="sm" onClick={() => void handleStartNewChat()}>
+                <Plus className="mr-2 size-4" />
+                new chat
+              </Button>
+            </div>
+
+            {chatHistory.length === 0 ? (
+              <p className="text-sm text-muted-foreground">no saved chats yet. start a chat and press new chat to save it here.</p>
+            ) : (
+              <ul className="divide-y divide-border/70 border-y border-border/70">
+                {chatHistory.map(session => (
+                  <li key={session.id} className={cn('py-4', session.id === activeChatId && 'bg-foreground/[0.03]')}>
+                    <div className="flex items-start justify-between gap-4">
+                      <button
+                        type="button"
+                        onClick={() => handleOpenHistoryChat(session.id)}
+                        className="min-w-0 flex-1 text-left"
+                      >
+                        <p className="truncate text-sm font-medium text-foreground">{session.title}</p>
+                        <p className="mt-1 font-mono text-[11px] text-muted-foreground">
+                          {formatSessionTime(session.updatedAt)} · {session.messages.filter(message => message.role === 'user').length} prompts
+                        </p>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteHistoryChat(session.id)}
+                        className="shrink-0 rounded-md p-1 text-muted-foreground transition-colors hover:bg-foreground/5 hover:text-destructive"
+                        aria-label="Delete chat history item"
+                      >
+                        <Trash2 className="size-4" />
+                      </button>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
+        )}
+
+        {view === 'settings' && (
+          <section>
+            <h1 className="text-base font-semibold tracking-tight">settings</h1>
+
+            <div className="mt-10 space-y-12">
+              <section className="space-y-4">
+                <h2 className="text-sm font-semibold">install app</h2>
+                <p className="text-xs text-muted-foreground">
+                  install citadel chat on desktop or mobile as a standalone offline-ready app.
+                </p>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={isInstallingPwa || isPwaInstalled}
+                  onClick={() => {
+                    void handleInstallPwa();
+                  }}
+                >
+                  <Download className="mr-2 size-4" />
+                  {isPwaInstalled ? 'already installed' : isInstallingPwa ? 'opening install prompt…' : 'install citadel chat'}
+                </Button>
+                {!deferredInstallPrompt && !isPwaInstalled && (
+                  <p className="text-[11px] text-muted-foreground">
+                    if no prompt appears, use your browser menu and choose install app or add to home screen.
+                  </p>
+                )}
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  disabled={isRefreshingOfflineCache}
+                  onClick={() => {
+                    void handleRefreshOfflineCache();
+                  }}
+                >
+                  <RefreshCw className={cn('mr-2 size-4', isRefreshingOfflineCache && 'animate-spin')} />
+                  {isRefreshingOfflineCache ? 'refreshing offline cache…' : 'refresh offline cache'}
+                </Button>
+                <p className="text-[11px] text-muted-foreground">
+                  refresh offline cache after updates to keep this install fully usable without network.
+                </p>
+              </section>
+
+              <section className="space-y-4">
+                <h2 className="text-sm font-semibold">interface</h2>
+                <div className="flex items-center justify-between border-b border-border/70 py-3">
+                  <div>
+                    <p className="text-sm">dark mode</p>
+                    <p className="text-xs text-muted-foreground">Default operating theme for low-light use.</p>
+                  </div>
+                  <Switch
+                    checked={theme === 'dark'}
+                    onCheckedChange={(checked) => setTheme(checked ? 'dark' : 'light')}
+                    aria-label="Toggle dark mode"
+                  />
+                </div>
+                <div className="flex items-center justify-between border-b border-border/70 py-3">
+                  <div>
+                    <p className="text-sm">use knowledge packs in chat</p>
+                    <p className="text-xs text-muted-foreground">When off, responses are model-only with no local pack retrieval.</p>
+                  </div>
+                  <Switch
+                    checked={useKnowledge}
+                    onCheckedChange={setUseKnowledge}
+                    aria-label="Toggle knowledge packs in chat"
+                  />
+                </div>
+                <div className="flex items-center justify-between border-b border-border/70 py-3">
+                  <div>
+                    <p className="text-sm">auto-load model on startup</p>
+                    <p className="text-xs text-muted-foreground">Load selected model automatically after launch.</p>
+                  </div>
+                  <Switch
+                    checked={appSettings.autoLoadModel}
+                    onCheckedChange={(checked) => {
+                      void saveSettings({ autoLoadModel: checked });
+                    }}
+                    aria-label="Toggle auto-load model"
+                  />
+                </div>
+              </section>
+
+              <section className="space-y-4">
+                <h2 className="text-sm font-semibold">models</h2>
+                <p className="text-xs text-muted-foreground">
+                  {runtimeCompatibility.headline}. {runtimeCompatibility.detail}
+                </p>
+                {engineError && <p className="text-xs text-destructive">{engineError}</p>}
+
+                <ul className="divide-y divide-border/70 border-y border-border/70">
+                  {availableModels.map(model => {
+                    const active = model.id === (currentModelId ?? appSettings.selectedModelId);
+                    const cached = cachedModelStatus[model.id];
+
+                    return (
+                      <li key={model.id} className={cn('py-4', active && 'bg-foreground/[0.03]')}>
+                        <div className="flex items-start justify-between gap-4">
+                          <div className="min-w-0">
+                            <p className="text-sm font-medium">{model.name}</p>
+                            <p className="mt-1 text-sm text-muted-foreground">{model.description}</p>
+                            <p className="mt-2 font-mono text-[11px] text-muted-foreground">
+                              {model.id} · {model.sizeLabel} · {model.speed} · {model.quality}
+                              {cached ? ' · cached' : ''}
+                            </p>
+                          </div>
+                          <Button
+                            variant={active ? 'secondary' : 'outline'}
+                            size="sm"
+                            disabled={isLoadingEngine}
+                            onClick={() => void loadModel(model.id)}
+                            className="shrink-0"
+                          >
+                            {active ? 'active' : 'load'}
+                          </Button>
+                        </div>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </section>
+
+              <section className="space-y-4">
+                <h2 className="text-sm font-semibold">storage</h2>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={loadingStorage}
+                  onClick={() => {
+                    setLoadingStorage(true);
+                    void getStorageInfo()
+                      .then(setStorageUsage)
+                      .finally(() => setLoadingStorage(false));
+                  }}
+                >
+                  {loadingStorage ? 'checking…' : 'check local usage'}
+                </Button>
+
+                {storageUsage && (
+                  <p className="font-mono text-[12px] text-muted-foreground">
+                    used {formatBytes(storageUsage.usedBytes)} / quota {formatBytes(storageUsage.quotaBytes)}
+                  </p>
+                )}
+              </section>
+
+              <section className="space-y-4">
+                <h2 className="text-sm font-semibold">reset</h2>
+                <p className="text-xs text-muted-foreground">Remove local model cache, downloaded packs, and saved settings from this browser.</p>
+
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button variant="destructive" size="sm">reset all local data</Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Reset Citadel Chat?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        This clears all model caches, knowledge packs, and saved settings from this browser.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={() => {
+                          void resetApplicationData();
+                        }}
+                      >
+                        Reset
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </section>
+            </div>
+
+            <footer className="mt-16 pb-4 text-xs text-muted-foreground/80">
+              <a href="https://shakespeare.diy" target="_blank" rel="noreferrer" className="underline underline-offset-4">
+                Vibed with Shakespeare
+              </a>
+            </footer>
+          </section>
+        )}
+      </main>
+
+      <BottomNav view={view} onViewChange={setView} />
     </div>
   );
+
+  async function handleStartNewChat() {
+    let saved = false;
+
+    if (hasMeaningfulMessages(messages)) {
+      const sessionId = activeChatId ?? crypto.randomUUID();
+      const session: SavedChatSession = {
+        id: sessionId,
+        title: buildSessionTitle(messages),
+        updatedAt: Date.now(),
+        messages,
+        useKnowledge,
+      };
+
+      setChatHistory(current => upsertSession(current, session));
+      saved = true;
+    }
+
+    setMessages([INITIAL_MESSAGE]);
+    setPrompt('');
+    setActiveChatId(null);
+    setView('chat');
+
+    if (saved) {
+      toast({
+        title: 'Chat saved',
+        description: 'Current conversation was saved to history.',
+      });
+    }
+  }
+
+  function handleOpenHistoryChat(sessionId: string) {
+    const target = chatHistory.find(session => session.id === sessionId);
+    if (!target) {
+      return;
+    }
+
+    setActiveChatId(target.id);
+    setMessages(target.messages.length > 0 ? target.messages : [INITIAL_MESSAGE]);
+    setUseKnowledge(target.useKnowledge);
+    setPrompt('');
+    setView('chat');
+  }
+
+  function handleDeleteHistoryChat(sessionId: string) {
+    setChatHistory(current => current.filter(session => session.id !== sessionId));
+
+    if (activeChatId === sessionId) {
+      setActiveChatId(null);
+      setMessages([INITIAL_MESSAGE]);
+      setPrompt('');
+    }
+  }
+
+  async function handleInstallPack(packId: string) {
+    if (installingPackIds.includes(packId)) {
+      return;
+    }
+
+    setInstallingPackIds(current => [...current, packId]);
+
+    try {
+      await installKnowledgePack(packId);
+      toast({
+        title: 'Pack downloaded',
+        description: 'Knowledge pack is now available offline.',
+      });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to download knowledge pack.';
+      toast({
+        title: 'Download failed',
+        description: message,
+        variant: 'destructive',
+      });
+    } finally {
+      setInstallingPackIds(current => current.filter(id => id !== packId));
+    }
+  }
+
+  async function handleInstallRecommendedPacks() {
+    if (isInstallingRecommended || recommendedAvailablePacks.length === 0) {
+      return;
+    }
+
+    setIsInstallingRecommended(true);
+
+    try {
+      for (const pack of recommendedAvailablePacks) {
+        // eslint-disable-next-line no-await-in-loop
+        await installKnowledgePack(pack.id);
+      }
+
+      toast({
+        title: 'Recommended packs downloaded',
+        description: 'Recommended knowledge packs are now available offline.',
+      });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to download recommended packs.';
+      toast({
+        title: 'Download failed',
+        description: message,
+        variant: 'destructive',
+      });
+    } finally {
+      setIsInstallingRecommended(false);
+    }
+  }
 
   async function handleInstallPwa() {
     if (isPwaInstalled || isInstallingPwa) {
@@ -630,6 +904,11 @@ export default function Index() {
 
     setPrompt('');
     setMessages(current => [...current, userMessage, assistantMessage]);
+
+    if (!activeChatId) {
+      setActiveChatId(crypto.randomUUID());
+    }
+
     setIsSending(true);
 
     try {
@@ -671,7 +950,7 @@ export default function Index() {
   }
 }
 
-function NavigationRail({
+function BottomNav({
   view,
   onViewChange,
 }: {
@@ -679,8 +958,8 @@ function NavigationRail({
   onViewChange: (view: AppView) => void;
 }) {
   return (
-    <div className="flex h-full flex-col items-center py-4">
-      <div className="flex flex-col gap-2">
+    <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-border/80 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
+      <div className="mx-auto grid w-full max-w-5xl grid-cols-4 px-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-2">
         {NAV_ITEMS.map(item => {
           const Icon = item.icon;
           const active = view === item.id;
@@ -691,29 +970,18 @@ function NavigationRail({
               type="button"
               onClick={() => onViewChange(item.id)}
               className={cn(
-                'rail-icon-transition relative flex h-10 w-10 items-center justify-center rounded-md text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-foreground',
-                active && 'text-primary',
+                'flex flex-col items-center justify-center gap-1 rounded-md px-2 py-2 text-[11px] transition-colors',
+                active ? 'text-primary' : 'text-muted-foreground hover:text-foreground',
               )}
               aria-label={item.label}
-              title={item.label}
             >
-              {active && <span className="absolute left-0 top-1/2 h-6 w-0.5 -translate-y-1/2 rounded-full bg-primary" aria-hidden />}
               <Icon className="size-4" />
+              <span>{item.label}</span>
             </button>
           );
         })}
       </div>
-
-      <a
-        href="https://citadelwire.com"
-        target="_blank"
-        rel="noreferrer"
-        aria-label="Citadel"
-        className="mt-auto inline-flex h-8 w-8 items-center justify-center rounded-full border border-sidebar-border/80 bg-sidebar-accent/40 hover:border-primary/60"
-      >
-        <img src="/citadel-logo.png" alt="Citadel" className="h-6 w-6 rounded-full object-cover" />
-      </a>
-    </div>
+    </nav>
   );
 }
 
