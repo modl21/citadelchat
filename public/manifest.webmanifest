@@ -1,11 +1,31 @@
 {
-  "name": "Citadel Chat",
-  "short_name": "Citadel",
-  "description": "Offline-first local AI command center with downloadable knowledge packs.",
+  "name": "citadel chat",
+  "short_name": "citadel",
+  "description": "offline citadel knowledge base",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
-  "background_color": "#0f131d",
-  "theme_color": "#22b573",
-  "icons": []
+  "orientation": "any",
+  "background_color": "#0d0d0d",
+  "theme_color": "#0d0d0d",
+  "icons": [
+    {
+      "src": "/citadel-logo.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/citadel-logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/citadel-logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
 }

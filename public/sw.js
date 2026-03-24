@@ -1,4 +1,4 @@
-const CACHE_NAME = 'citadel-chat-cache-v4';
+const CACHE_NAME = 'citadel-chat-cache-v5';
 const OFFLINE_ASSETS = [
   '/',
   '/index.html',
@@ -20,9 +20,14 @@ const OFFLINE_ASSETS = [
   '/knowledge-packs/water-systems.json',
 ];
 
+async function warmOfflineAssets() {
+  const cache = await caches.open(CACHE_NAME);
+  await cache.addAll(OFFLINE_ASSETS);
+}
+
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(OFFLINE_ASSETS)).then(() => self.skipWaiting())
+    warmOfflineAssets().then(() => self.skipWaiting())
   );
 });
 
@@ -34,6 +39,28 @@ self.addEventListener('activate', (event) => {
         .map((key) => caches.delete(key))
     )).then(() => self.clients.claim())
   );
+});
+
+self.addEventListener('message', (event) => {
+  if (!event.data || typeof event.data !== 'object') {
+    return;
+  }
+
+  if (event.data.type === 'CACHE_KNOWLEDGE_PACKS') {
+    event.waitUntil(
+      warmOfflineAssets()
+        .then(() => {
+          if (event.source && 'postMessage' in event.source) {
+            event.source.postMessage({ type: 'CACHE_READY' });
+          }
+        })
+        .catch(() => {
+          if (event.source && 'postMessage' in event.source) {
+            event.source.postMessage({ type: 'CACHE_ERROR' });
+          }
+        })
+    );
+  }
 });
 
 self.addEventListener('fetch', (event) => {
