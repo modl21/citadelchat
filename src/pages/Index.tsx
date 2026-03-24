@@ -139,7 +139,7 @@ export default function Index() {
         </aside>
 
         <main className="relative flex min-h-screen flex-1 flex-col">
-          <header className="flex h-14 shrink-0 items-center border-b border-border/70 px-3 md:px-6 lg:px-8">
+          <header className="sticky top-0 z-30 flex h-16 shrink-0 items-center border-b border-border/70 bg-background/95 px-3 backdrop-blur md:px-6 lg:px-8">
             <div className="flex items-center gap-2">
               <Sheet open={mobileRailOpen} onOpenChange={setMobileRailOpen}>
                 <SheetTrigger asChild>
@@ -170,12 +170,12 @@ export default function Index() {
                 className="inline-flex items-center rounded-full border border-border/70 p-0.5 transition-colors hover:border-primary"
                 aria-label="Citadel"
               >
-                <img src="/citadel-logo.jpg" alt="Citadel" className="h-7 w-7 rounded-full object-cover" />
+                <img src="/citadel-logo.jpg" alt="Citadel" className="h-8 w-8 rounded-full object-cover" />
               </a>
             </div>
 
             <div className="min-w-0 flex-1 px-2 text-center">
-              <h1 className="truncate text-sm font-semibold tracking-tight">citadel chat: your offline citadel brain</h1>
+              <h1 className="text-xs font-semibold tracking-tight text-foreground sm:text-sm md:text-base">citadel chat: your offline citadel brain</h1>
             </div>
 
             <a
@@ -185,7 +185,7 @@ export default function Index() {
               className="inline-flex items-center gap-2 rounded-full border border-border/70 px-2 py-1 text-[11px] text-muted-foreground transition-colors hover:border-primary hover:text-foreground"
             >
               <img src="/odell-badge.jpg" alt="ODELL" className="h-5 w-5 rounded-full object-cover" />
-              <span>curated by ODELL</span>
+              <span className="hidden md:inline">curated by ODELL</span>
             </a>
           </header>
 
