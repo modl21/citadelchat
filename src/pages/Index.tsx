@@ -23,8 +23,9 @@ import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { toast } from '@/hooks/useToast';
 import { useTheme } from '@/hooks/useTheme';
 import { SetupWizard } from '@/components/SetupWizard';
+import { useIsMobile } from '@/hooks/useIsMobile';
 import { KNOWLEDGE_PACKS } from '@/lib/knowledge-packs';
-import { formatBytes } from '@/lib/webllm-models';
+import { filterModelsForDevice, formatBytes } from '@/lib/webllm-models';
 
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -141,6 +142,7 @@ export default function Index() {
   } = useCitadel();
 
   const { theme, setTheme } = useTheme();
+  const isMobile = useIsMobile();
 
   const [setupCompletedState, setSetupCompletedState] = useState(appSettings.setupComplete);
   const [view, setView] = useState<AppView>('chat');
@@ -262,6 +264,11 @@ export default function Index() {
   const recommendedAvailablePacks = useMemo(
     () => availablePacks.filter(pack => pack.recommended),
     [availablePacks],
+  );
+
+  const modelsToOffer = useMemo(
+    () => filterModelsForDevice(availableModels, isMobile),
+    [availableModels, isMobile],
   );
 
   const normalizedSystemPromptDraft = systemPromptDraft.trim();
@@ -610,10 +617,13 @@ export default function Index() {
                 <p className="text-xs text-muted-foreground">
                   {runtimeCompatibility.headline}. {runtimeCompatibility.detail}
                 </p>
+                {isMobile && (
+                  <p className="text-xs text-muted-foreground">more powerful models available on desktop</p>
+                )}
                 {engineError && <p className="text-xs text-destructive">{engineError}</p>}
 
                 <ul className="divide-y divide-border/70 border-y border-border/70">
-                  {availableModels.map(model => {
+                  {modelsToOffer.map(model => {
                     const active = model.id === (currentModelId ?? appSettings.selectedModelId);
                     const cached = cachedModelStatus[model.id];
 

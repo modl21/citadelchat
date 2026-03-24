@@ -10,7 +10,21 @@ export interface ModelOption {
   recommended?: boolean;
 }
 
+export const MOBILE_MODEL_IDS = [
+  'Qwen2.5-0.5B-Instruct-q4f16_1-MLC',
+  'Qwen2.5-1.5B-Instruct-q4f16_1-MLC',
+] as const;
+
 export const MODEL_OPTIONS: ModelOption[] = [
+  {
+    id: 'Qwen2.5-0.5B-Instruct-q4f16_1-MLC',
+    name: 'Qwen 2.5 0.5B',
+    description: 'Smallest and fastest model. Ideal for low-end devices and quick responses.',
+    sizeLabel: '~650 MB',
+    sizeBytes: 650_000_000,
+    speed: 'very-fast',
+    quality: 'basic',
+  },
   {
     id: 'Qwen2.5-1.5B-Instruct-q4f16_1-MLC',
     name: 'Qwen 2.5 1.5B',
@@ -52,6 +66,15 @@ export const MODEL_OPTIONS: ModelOption[] = [
 
 export function getModelById(id: string): ModelOption | undefined {
   return MODEL_OPTIONS.find(model => model.id === id);
+}
+
+export function filterModelsForDevice(models: ModelOption[], isMobile: boolean): ModelOption[] {
+  if (!isMobile) {
+    return models;
+  }
+
+  const mobileIds = new Set<string>(MOBILE_MODEL_IDS);
+  return models.filter(model => mobileIds.has(model.id));
 }
 
 export function formatBytes(bytes: number): string {
