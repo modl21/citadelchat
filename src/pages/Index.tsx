@@ -1,10 +1,12 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { HardDrive, Menu, MessageSquare, Send, Settings } from 'lucide-react';
+import JSZip from 'jszip';
+import { Download, HardDrive, Menu, MessageSquare, Send, Settings } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 
 import { useSeoMeta } from '@unhead/react';
 
 import { useCitadel, type CitadelMessage } from '@/contexts/CitadelContext';
+import { toast } from '@/hooks/useToast';
 import { useTheme } from '@/hooks/useTheme';
 import { SetupWizard } from '@/components/SetupWizard';
 import { KNOWLEDGE_PACKS } from '@/lib/knowledge-packs';
@@ -30,6 +32,30 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 
+const OFFLINE_EXPORT_FILES = [
+  '/index.html',
+  '/manifest.webmanifest',
+  '/sw.js',
+  '/_redirects',
+  '/robots.txt',
+  '/citadel-logo.jpg',
+  '/citadel-logo.png',
+  '/odell-badge.jpg',
+  '/knowledge-packs/emergency-medical.json',
+  '/knowledge-packs/water-food.json',
+  '/knowledge-packs/comms-navigation.json',
+  '/knowledge-packs/field-engineering.json',
+  '/knowledge-packs/long-term-agriculture.json',
+  '/knowledge-packs/off-grid-medicine.json',
+  '/knowledge-packs/cbrn-survival.json',
+  '/knowledge-packs/trade-barter.json',
+  '/knowledge-packs/firearms-weapons.json',
+  '/knowledge-packs/perimeter-defense.json',
+  '/knowledge-packs/mechanical-repair.json',
+  '/knowledge-packs/fuel-heat-cooking.json',
+  '/knowledge-packs/water-systems.json',
+] as const;
+
 const INITIAL_MESSAGE: CitadelMessage = {
   id: 'welcome',
   role: 'assistant',
@@ -50,6 +76,135 @@ const NAV_ITEMS: NavItem[] = [
   { id: 'library', label: 'Library', icon: HardDrive },
   { id: 'settings', label: 'Settings', icon: Settings },
 ];
+
+const OFFLINE_BOOTSTRAP_SNIPPET = `<script>
+(() => {
+  if (window.location.protocol !== 'file:') return;
+
+  const originalFetch = window.fetch.bind(window);
+
+  window.fetch = (input, init) => {
+    if (typeof input === 'string' && input.startsWith('/')) {
+      const relativePath = '.' + input;
+      return originalFetch(new URL(relativePath, window.location.href).toString(), init);
+    }
+
+    return originalFetch(input, init);
+  };
+})();
+</script>`;
+
+function toOfflineRelativePath(path: string): string {
+  if (path.startsWith('./')) {
+    return path;
+  }
+
+  if (path.startsWith('/')) {
+    return `.${path}`;
+  }
+
+  return path;
+}
+
+function injectOfflineBootstrap(indexHtml: string): string {
+  const withRelativePaths = indexHtml.replace(/(src|href)=["'](\/(?!\/)[^"']*)["']/g, (_match, attr, path) => {
+    return `${attr}="${toOfflineRelativePath(path)}"`;
+  });
+
+  if (withRelativePaths.includes(OFFLINE_BOOTSTRAP_SNIPPET)) {
+    return withRelativePaths;
+  }
+
+  if (withRelativePaths.includes('</head>')) {
+    return withRelativePaths.replace('</head>', `  ${OFFLINE_BOOTSTRAP_SNIPPET}\n  </head>`);
+  }
+
+  return `${OFFLINE_BOOTSTRAP_SNIPPET}\n${withRelativePaths}`;
+}
+
+function replaceQuotedAbsolutePath(content: string, absolutePrefix: string): string {
+  const escaped = absolutePrefix.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const relative = `./${absolutePrefix.slice(1)}`;
+
+  return content
+    .replace(new RegExp(`"${escaped}`, 'g'), `"${relative}`)
+    .replace(new RegExp(`'${escaped}`, 'g'), `'${relative}`);
+}
+
+function rewriteTextAssetForOffline(content: string, filePath: string): string {
+  if (filePath.endsWith('manifest.webmanifest')) {
+    try {
+      const manifest = JSON.parse(content) as {
+        start_url?: string;
+        scope?: string;
+      };
+
+      manifest.start_url = './index.html';
+      manifest.scope = './';
+
+      return `${JSON.stringify(manifest, null, 2)}\n`;
+    } catch {
+      return content;
+    }
+  }
+
+  let rewritten = content;
+  const prefixes = [
+    '/knowledge-packs/',
+    '/manifest.webmanifest',
+    '/sw.js',
+    '/citadel-logo.jpg',
+    '/citadel-logo.png',
+    '/odell-badge.jpg',
+    '/main-',
+    '/shakespeare_tailwind.config-',
+    '/index.html',
+    '/robots.txt',
+    '/_redirects',
+    '/assets/',
+  ];
+
+  for (const prefix of prefixes) {
+    rewritten = replaceQuotedAbsolutePath(rewritten, prefix);
+  }
+
+  return rewritten;
+}
+
+function extractAssetPathsFromIndex(indexHtml: string): string[] {
+  const matches = [...indexHtml.matchAll(/(?:src|href)=["'](\/(?!\/)[^"']+)["']/g)];
+  const unique = new Set<string>();
+
+  for (const match of matches) {
+    const path = match[1];
+    if (!path.startsWith('/@')) {
+      unique.add(path);
+    }
+  }
+
+  return Array.from(unique);
+}
+
+function isTextAsset(contentType: string | null, filePath: string): boolean {
+  if (!contentType) {
+    return /\.(html|js|css|json|txt|webmanifest|map)$/i.test(filePath);
+  }
+
+  return (
+    contentType.includes('text/')
+    || contentType.includes('javascript')
+    || contentType.includes('json')
+    || contentType.includes('xml')
+    || contentType.includes('svg')
+  );
+}
+
+function normalizeAssetPath(path: string): string {
+  const clean = path.split('#')[0].split('?')[0];
+  if (clean.startsWith('/')) return clean;
+  if (clean.startsWith('./')) return `/${clean.slice(2)}`;
+  return `/${clean}`;
+}
 
 export default function Index() {
   useSeoMeta({
@@ -89,6 +244,7 @@ export default function Index() {
 
   const [storageUsage, setStorageUsage] = useState<{ usedBytes: number; quotaBytes: number } | null>(null);
   const [loadingStorage, setLoadingStorage] = useState(false);
+  const [isExportingOfflineBundle, setIsExportingOfflineBundle] = useState(false);
 
   const composerRef = useRef<HTMLTextAreaElement | null>(null);
   const messageEndRef = useRef<HTMLDivElement | null>(null);
@@ -267,6 +423,27 @@ export default function Index() {
 
                 <div className="mt-10 space-y-12">
                   <section className="space-y-4">
+                    <h2 className="text-sm font-semibold">offline bundle</h2>
+                    <p className="text-xs text-muted-foreground">
+                      export a self-contained package you can save and run without internet on desktop or mobile.
+                    </p>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      disabled={isExportingOfflineBundle}
+                      onClick={() => {
+                        void handleDownloadOfflineBundle();
+                      }}
+                    >
+                      <Download className="mr-2 size-4" />
+                      {isExportingOfflineBundle ? 'building bundle…' : 'download offline app bundle'}
+                    </Button>
+                    <p className="text-[11px] text-muted-foreground">
+                      includes the current app shell and all built-in knowledge packs.
+                    </p>
+                  </section>
+
+                  <section className="space-y-4">
                     <h2 className="text-sm font-semibold">interface</h2>
                     <div className="flex items-center justify-between border-b border-border/70 py-3">
                       <div>
@@ -409,6 +586,93 @@ export default function Index() {
       </div>
     </div>
   );
+
+  async function handleDownloadOfflineBundle() {
+    if (isExportingOfflineBundle) {
+      return;
+    }
+
+    setIsExportingOfflineBundle(true);
+
+    try {
+      const zip = new JSZip();
+      const indexResponse = await fetch('/index.html', { cache: 'no-store' });
+      if (!indexResponse.ok) {
+        throw new Error('Failed to fetch app index for offline bundle.');
+      }
+
+      const indexHtmlSource = await indexResponse.text();
+      const discoveredAssets = extractAssetPathsFromIndex(indexHtmlSource);
+      const filesToFetch = Array.from(new Set([...OFFLINE_EXPORT_FILES, ...discoveredAssets]));
+
+      for (const filePath of filesToFetch) {
+        const normalizedPath = normalizeAssetPath(filePath);
+        const response = await fetch(normalizedPath, { cache: 'no-store' });
+
+        if (!response.ok) {
+          throw new Error(`Missing required file for offline export: ${normalizedPath}`);
+        }
+
+        const outputPath = normalizedPath.replace(/^\//, '');
+
+        if (normalizedPath === '/index.html') {
+          const rewrittenIndex = injectOfflineBootstrap(indexHtmlSource);
+          zip.file(outputPath, rewrittenIndex);
+          continue;
+        }
+
+        const contentType = response.headers.get('content-type');
+
+        if (isTextAsset(contentType, normalizedPath)) {
+          const sourceText = await response.text();
+          const rewrittenText = rewriteTextAssetForOffline(sourceText, normalizedPath);
+          zip.file(outputPath, rewrittenText);
+        } else {
+          const binary = await response.arrayBuffer();
+          zip.file(outputPath, binary);
+        }
+      }
+
+      zip.file(
+        'README.txt',
+        [
+          'Citadel Chat Offline Bundle',
+          '',
+          'How to use:',
+          '1. Extract this zip.',
+          '2. Open index.html from local storage.',
+          '3. If your browser blocks local file execution, serve this folder with any simple static server.',
+          '',
+          'This bundle includes the app shell and built-in knowledge packs for offline use.',
+        ].join('\n'),
+      );
+
+      const archiveBlob = await zip.generateAsync({ type: 'blob', compression: 'DEFLATE', compressionOptions: { level: 9 } });
+      const downloadUrl = URL.createObjectURL(archiveBlob);
+      const anchor = document.createElement('a');
+      anchor.href = downloadUrl;
+      anchor.download = `citadel-chat-offline-bundle-${new Date().toISOString().slice(0, 10)}.zip`;
+      anchor.style.display = 'none';
+      document.body.appendChild(anchor);
+      anchor.click();
+      document.body.removeChild(anchor);
+      URL.revokeObjectURL(downloadUrl);
+
+      toast({
+        title: 'Offline bundle ready',
+        description: 'Download started. Save the zip to keep a self-contained offline copy.',
+      });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Offline bundle creation failed.';
+      toast({
+        title: 'Offline export failed',
+        description: message,
+        variant: 'destructive',
+      });
+    } finally {
+      setIsExportingOfflineBundle(false);
+    }
+  }
 
   async function handleSend() {
     const trimmed = prompt.trim();
