@@ -51,7 +51,7 @@ type BeforeInstallPromptEvent = Event & {
 const INITIAL_MESSAGE: CitadelMessage = {
   id: 'welcome',
   role: 'assistant',
-  content: 'Citadel Chat is online locally. Ask anything from your downloaded packs or run general local AI chat.',
+  content: 'you are offline but have full knowledge pack access, ask anything to get started',
   createdAt: Date.now(),
 };
 
