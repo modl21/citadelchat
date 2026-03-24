@@ -1,0 +1,48 @@
+{
+  "id": "bitcoin-basics",
+  "title": "Bitcoin Fundamentals and Self-Custody",
+  "version": "1.0.0",
+  "updatedAt": "2026-03-24",
+  "documents": [
+    {
+      "id": "what-bitcoin-is",
+      "title": "What Bitcoin Is (and Is Not)",
+      "content": "Bitcoin is a decentralized digital money system secured by cryptography and a public blockchain. It has no central issuer and no single party can arbitrarily inflate supply above the 21 million cap. A bitcoin is divisible into 100,000,000 satoshis (sats). Bitcoin is not anonymous by default; it is pseudonymous and transaction history is public. Privacy and custody require intentional operational practices."
+    },
+    {
+      "id": "keys-and-custody",
+      "title": "Private Keys, Seed Phrases, and Custody",
+      "content": "Control over bitcoin comes from private keys. Most wallets back up keys as a seed phrase (typically 12 or 24 words). Anyone who gets that phrase can spend funds. Store seed backups offline, in durable form, in more than one secure location. Never screenshot or cloud-store your seed phrase. Verify wallet backups with a recovery test on a separate device before storing meaningful value."
+    },
+    {
+      "id": "wallet-types",
+      "title": "Wallet Types and Practical Tradeoffs",
+      "content": "Custodial wallets are easy but require trust in a provider. Non-custodial hot wallets give direct key control but are exposed to phone/computer risk. Hardware wallets isolate keys and are safer for larger balances. A practical model is layered custody: spending funds in a hot wallet, savings in a hardware wallet, and clear written procedures for backup and inheritance."
+    },
+    {
+      "id": "transaction-flow",
+      "title": "Transaction Basics and Confirmations",
+      "content": "Bitcoin transactions enter the mempool first, then are included in blocks. One confirmation means inclusion in one mined block. For small in-person payments, risk tolerance may allow fewer confirmations; for larger transfers, wait for additional confirmations (commonly 3-6 depending on risk). Always verify recipient address carefully and consider test sends for large transfers."
+    },
+    {
+      "id": "fees-and-mempool",
+      "title": "Fees, Mempool Congestion, and Timing",
+      "content": "On-chain fees are market-based and depend on blockspace demand. Use wallet fee estimation and mempool awareness to avoid overpaying. If supported, Replace-By-Fee (RBF) can increase fee later for stuck transactions. Child-Pays-For-Parent (CPFP) can also accelerate confirmation when available. For non-urgent transfers, send during lower congestion windows."
+    },
+    {
+      "id": "lightning-basics",
+      "title": "Lightning Network Basics",
+      "content": "Lightning enables fast, low-fee bitcoin payments through payment channels while settling to Bitcoin when needed. Many users start with custodial Lightning for convenience, then migrate to self-custodial Lightning as skills improve. Keep only spending balances in Lightning wallets and periodically settle long-term savings back to self-custodied on-chain storage."
+    },
+    {
+      "id": "security-checklist",
+      "title": "Bitcoin Security Checklist",
+      "content": "Use unique strong passphrases and device PINs. Keep wallet software and firmware up to date from official sources. Confirm receive addresses on trusted screens for large transactions. Use two-person verification for high-value transfers. Keep an incident plan for lost device, suspected compromise, and seed backup retrieval. Treat every urgent message involving funds as potentially malicious until verified out-of-band."
+    },
+    {
+      "id": "common-scams",
+      "title": "Common Bitcoin Scams and Red Flags",
+      "content": "Avoid promises of guaranteed returns, giveaway multipliers, fake support accounts, and pressure to reveal seed phrases. No legitimate support agent ever needs your seed phrase. Verify domains, app publishers, and contact channels before acting. Ignore unsolicited recovery offers after loss events. Slow down and verify independently before sending irreversible payments."
+    }
+  ]
+}

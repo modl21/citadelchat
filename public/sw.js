@@ -1,4 +1,4 @@
-const CACHE_NAME = 'citadel-chat-cache-v7';
+const CACHE_NAME = 'citadel-chat-cache-v8';
 const OFFLINE_ASSETS = [
   '/',
   '/index.html',
@@ -15,6 +15,7 @@ const OFFLINE_ASSETS = [
   '/knowledge-packs/off-grid-medicine.json',
   '/knowledge-packs/cbrn-survival.json',
   '/knowledge-packs/trade-barter.json',
+  '/knowledge-packs/bitcoin-basics.json',
   '/knowledge-packs/firearms-weapons.json',
   '/knowledge-packs/perimeter-defense.json',
   '/knowledge-packs/mechanical-repair.json',

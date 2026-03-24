@@ -103,6 +103,17 @@ export const KNOWLEDGE_PACKS: KnowledgePackMeta[] = [
     docCount: 5,
   },
   {
+    id: 'bitcoin-basics',
+    title: 'Bitcoin Fundamentals and Self-Custody',
+    description: 'Practical Bitcoin safety, wallet setup, transaction fees, Lightning basics, and scam defense.',
+    category: 'security',
+    filePath: '/knowledge-packs/bitcoin-basics.json',
+    sizeBytes: 2_000_000,
+    sizeLabel: '~2.0 MB',
+    docCount: 8,
+    recommended: true,
+  },
+  {
     id: 'firearms-weapons',
     title: 'Firearms and Defensive Weapons',
     description: 'Weapon safety, maintenance, ammo discipline, low-light procedures, and team fire control.',
@@ -212,7 +223,7 @@ export const KNOWLEDGE_PRESETS: KnowledgePreset[] = [
     id: 'tech-ops',
     name: 'Technical & Secure Ops',
     description: 'Power systems, security architecture, comms, mesh services, and repair capability.',
-    packIds: ['comms-navigation', 'offline-information-systems', 'field-engineering', 'trade-barter', 'mechanical-repair', 'perimeter-defense', 'firearms-weapons'],
+    packIds: ['comms-navigation', 'offline-information-systems', 'field-engineering', 'trade-barter', 'bitcoin-basics', 'mechanical-repair', 'perimeter-defense', 'firearms-weapons'],
   },
   {
     id: 'homestead',
@@ -224,7 +235,7 @@ export const KNOWLEDGE_PRESETS: KnowledgePreset[] = [
     id: 'security-core',
     name: 'Security Core',
     description: 'Defensive readiness with comms, perimeter hardening, governance, and weapons safety workflows.',
-    packIds: ['comms-navigation', 'perimeter-defense', 'community-governance', 'firearms-weapons', 'trade-barter'],
+    packIds: ['comms-navigation', 'perimeter-defense', 'community-governance', 'firearms-weapons', 'trade-barter', 'bitcoin-basics'],
   },
   {
     id: 'infrastructure-core',
