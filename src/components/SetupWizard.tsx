@@ -162,7 +162,7 @@ export function SetupWizard({ onComplete }: SetupWizardProps) {
             <section>
               <h1 className="text-2xl font-semibold tracking-tight">choose your model</h1>
               <p className="mt-3 text-sm text-muted-foreground">
-                pick one local model for offline chat. you can switch models later in settings.
+                pick a local model for offline chat. you can switch models later in settings.
               </p>
 
               <button
