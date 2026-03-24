@@ -130,6 +130,31 @@ export function SetupWizard({ onComplete }: SetupWizardProps) {
       )}
 
       <div className="mx-auto flex min-h-screen w-full max-w-3xl flex-col px-6 pb-8 pt-10 md:px-10 md:pt-14">
+        <div className="mb-6 space-y-3">
+          <div className="flex items-center gap-3">
+            <a
+              href="https://citadelwire.com"
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center rounded-full border border-border/70 p-0.5 transition-colors hover:border-primary"
+              aria-label="Citadel"
+            >
+              <img src="/citadel-logo.jpg" alt="Citadel" className="h-8 w-8 rounded-full object-cover" />
+            </a>
+            <h1 className="text-base font-semibold tracking-tight sm:text-lg md:text-xl">citadel chat: offline citadel knowledge base</h1>
+          </div>
+
+          <a
+            href="https://odell.xyz"
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center gap-2 text-xs text-muted-foreground transition-colors hover:text-foreground"
+          >
+            <img src="/odell-badge.jpg" alt="ODELL" className="h-5 w-5 rounded-full object-cover" />
+            <span>curated by ODELL</span>
+          </a>
+        </div>
+
         <p className="font-mono text-[11px] text-muted-foreground">step {step} of 3</p>
 
         <div className="mt-8 flex flex-1 flex-col justify-center">

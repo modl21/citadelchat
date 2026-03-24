@@ -139,58 +139,32 @@ export default function Index() {
         </aside>
 
         <main className="relative flex min-h-screen flex-1 flex-col">
-          <header className="sticky top-0 z-30 flex h-16 shrink-0 items-center border-b border-border/70 bg-background/95 px-3 backdrop-blur md:px-6 lg:px-8">
-            <div className="flex items-center gap-2">
-              <Sheet open={mobileRailOpen} onOpenChange={setMobileRailOpen}>
-                <SheetTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8 rounded-md border border-border/70 text-muted-foreground md:hidden"
-                    aria-label="Open navigation"
-                  >
-                    <Menu className="size-4" />
-                  </Button>
-                </SheetTrigger>
-                <SheetContent side="left" className="w-full max-w-none border-r border-border/80 bg-sidebar p-0">
-                  <NavigationRail
-                    view={view}
-                    onViewChange={(nextView) => {
-                      setView(nextView);
-                      setMobileRailOpen(false);
-                    }}
-                  />
-                </SheetContent>
-              </Sheet>
-
-              <a
-                href="https://citadelwire.com"
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center rounded-full border border-border/70 p-0.5 transition-colors hover:border-primary"
-                aria-label="Citadel"
-              >
-                <img src="/citadel-logo.jpg" alt="Citadel" className="h-8 w-8 rounded-full object-cover" />
-              </a>
-            </div>
-
-            <div className="min-w-0 flex-1 px-2 text-center">
-              <h1 className="text-xs font-semibold tracking-tight text-foreground sm:text-sm md:text-base">citadel chat: your offline citadel brain</h1>
-            </div>
-
-            <a
-              href="https://odell.xyz"
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex items-center gap-2 rounded-full border border-border/70 px-2 py-1 text-[11px] text-muted-foreground transition-colors hover:border-primary hover:text-foreground"
-            >
-              <img src="/odell-badge.jpg" alt="ODELL" className="h-5 w-5 rounded-full object-cover" />
-              <span className="hidden md:inline">curated by ODELL</span>
-            </a>
-          </header>
+          <div className="absolute left-3 top-3 z-20 md:hidden">
+            <Sheet open={mobileRailOpen} onOpenChange={setMobileRailOpen}>
+              <SheetTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-9 w-9 rounded-md border border-border/70 bg-background/85 text-muted-foreground"
+                  aria-label="Open navigation"
+                >
+                  <Menu className="size-4" />
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="left" className="w-full max-w-none border-r border-border/80 bg-sidebar p-0">
+                <NavigationRail
+                  view={view}
+                  onViewChange={(nextView) => {
+                    setView(nextView);
+                    setMobileRailOpen(false);
+                  }}
+                />
+              </SheetContent>
+            </Sheet>
+          </div>
 
           {view === 'chat' && (
-            <section className="flex min-h-0 flex-1 flex-col px-5 pb-6 pt-4 md:px-12 md:pb-8 md:pt-6 lg:px-16">
+            <section className="flex min-h-0 flex-1 flex-col px-5 pb-6 pt-14 md:px-12 md:pb-8 md:pt-8 lg:px-16">
               <div className="mx-auto flex w-full max-w-4xl flex-1 min-h-0 flex-col">
                 <div className="flex-1 overflow-y-auto">
                   <div className="space-y-8 pb-6">
