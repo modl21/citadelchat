@@ -1221,6 +1221,7 @@ function renderMarkdownLite(content: string): ReactNode {
   let listBuffer: string[] = [];
   let codeBuffer: string[] = [];
   let orderedList = false;
+  let orderedListStart: number | undefined;
   let inCodeBlock = false;
 
   const flushParagraph = () => {
@@ -1234,16 +1235,28 @@ function renderMarkdownLite(content: string): ReactNode {
 
   const flushList = () => {
     if (listBuffer.length === 0) return;
-    const ListTag = orderedList ? 'ol' : 'ul';
-    nodes.push(
-      <ListTag key={`l-${nodes.length}`}>
-        {listBuffer.map((item, index) => (
-          <li key={`li-${nodes.length}-${index}`}>{renderInlineMarkdown(item.trim())}</li>
-        ))}
-      </ListTag>,
-    );
+
+    if (orderedList) {
+      nodes.push(
+        <ol key={`l-${nodes.length}`} start={orderedListStart}>
+          {listBuffer.map((item, index) => (
+            <li key={`li-${nodes.length}-${index}`}>{renderInlineMarkdown(item.trim())}</li>
+          ))}
+        </ol>,
+      );
+    } else {
+      nodes.push(
+        <ul key={`l-${nodes.length}`}>
+          {listBuffer.map((item, index) => (
+            <li key={`li-${nodes.length}-${index}`}>{renderInlineMarkdown(item.trim())}</li>
+          ))}
+        </ul>,
+      );
+    }
+
     listBuffer = [];
     orderedList = false;
+    orderedListStart = undefined;
   };
 
   const flushCode = () => {
@@ -1319,14 +1332,22 @@ function renderMarkdownLite(content: string): ReactNode {
       continue;
     }
 
-    const ordered = trimmed.match(/^\d+\.\s+(.*)$/);
+    const ordered = trimmed.match(/^(\d+)\.\s+(.*)$/);
     if (ordered) {
       flushParagraph();
+
+      const nextNumber = Number.parseInt(ordered[1], 10);
+
       if (listBuffer.length > 0 && !orderedList) {
         flushList();
       }
-      orderedList = true;
-      listBuffer.push(ordered[1]);
+
+      if (!orderedList) {
+        orderedList = true;
+        orderedListStart = Number.isFinite(nextNumber) && nextNumber > 0 ? nextNumber : 1;
+      }
+
+      listBuffer.push(ordered[2]);
       continue;
     }
 
