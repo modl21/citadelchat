@@ -10,21 +10,21 @@
   "theme_color": "#0d0d0d",
   "icons": [
     {
-      "src": "/citadel-logo.png",
+      "src": "/citadeli.jpg",
       "sizes": "192x192",
-      "type": "image/png",
+      "type": "image/jpeg",
       "purpose": "any"
     },
     {
-      "src": "/citadel-logo.png",
+      "src": "/citadeli.jpg",
       "sizes": "512x512",
-      "type": "image/png",
+      "type": "image/jpeg",
       "purpose": "any"
     },
     {
-      "src": "/citadel-logo.png",
+      "src": "/citadeli.jpg",
       "sizes": "512x512",
-      "type": "image/png",
+      "type": "image/jpeg",
       "purpose": "maskable"
     }
   ]

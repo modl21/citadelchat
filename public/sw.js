@@ -4,6 +4,7 @@ const OFFLINE_ASSETS = [
   '/index.html',
   '/manifest.webmanifest',
   '/citadel-logo.jpg',
+  '/citadeli.jpg',
   '/odell-badge.jpg',
   '/knowledge-packs/emergency-medical.json',
   '/knowledge-packs/water-food.json',
