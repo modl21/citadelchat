@@ -166,27 +166,27 @@ function chooseBenchmarkRecommendation(score: number, availableModels: string[])
   if (score >= 80) {
     return {
       tier: 'ultra',
-      modelId: has('Qwen3-4B-q4f16_1-MLC') ? 'Qwen3-4B-q4f16_1-MLC' : (has('Llama-3.2-3B-Instruct-q4f16_1-MLC') ? 'Llama-3.2-3B-Instruct-q4f16_1-MLC' : availableModels[0]),
+      modelId: has('Phi-3.5-mini-instruct-q4f16_1-MLC') ? 'Phi-3.5-mini-instruct-q4f16_1-MLC' : (has('Qwen2.5-3B-Instruct-q4f16_1-MLC') ? 'Qwen2.5-3B-Instruct-q4f16_1-MLC' : availableModels[0]),
     };
   }
 
   if (score >= 60) {
     return {
       tier: 'high',
-      modelId: has('Qwen3-1.7B-q4f16_1-MLC') ? 'Qwen3-1.7B-q4f16_1-MLC' : (has('Qwen2.5-3B-Instruct-q4f16_1-MLC') ? 'Qwen2.5-3B-Instruct-q4f16_1-MLC' : availableModels[0]),
+      modelId: has('Qwen2.5-3B-Instruct-q4f16_1-MLC') ? 'Qwen2.5-3B-Instruct-q4f16_1-MLC' : (has('gemma-2-2b-it-q4f16_1-MLC') ? 'gemma-2-2b-it-q4f16_1-MLC' : availableModels[0]),
     };
   }
 
   if (score >= 40) {
     return {
       tier: 'medium',
-      modelId: has('Llama-3.2-1B-Instruct-q4f16_1-MLC') ? 'Llama-3.2-1B-Instruct-q4f16_1-MLC' : (has('Qwen2.5-1.5B-Instruct-q4f16_1-MLC') ? 'Qwen2.5-1.5B-Instruct-q4f16_1-MLC' : availableModels[0]),
+      modelId: has('gemma-2-2b-it-q4f16_1-MLC') ? 'gemma-2-2b-it-q4f16_1-MLC' : (has('Qwen2.5-1.5B-Instruct-q4f16_1-MLC') ? 'Qwen2.5-1.5B-Instruct-q4f16_1-MLC' : availableModels[0]),
     };
   }
 
   return {
     tier: 'low',
-    modelId: has('SmolLM2-360M-Instruct-q4f16_1-MLC') ? 'SmolLM2-360M-Instruct-q4f16_1-MLC' : availableModels[0],
+    modelId: has('Qwen2.5-1.5B-Instruct-q4f16_1-MLC') ? 'Qwen2.5-1.5B-Instruct-q4f16_1-MLC' : availableModels[0],
   };
 }
 
