@@ -12,6 +12,15 @@ export interface ModelOption {
 
 export const MODEL_OPTIONS: ModelOption[] = [
   {
+    id: 'Qwen2.5-0.5B-Instruct-q4f16_1-MLC',
+    name: 'Qwen 2.5 0.5B',
+    description: 'Smallest and fastest model. Ideal for low-end devices and quick responses.',
+    sizeLabel: '~650 MB',
+    sizeBytes: 650_000_000,
+    speed: 'very-fast',
+    quality: 'basic',
+  },
+  {
     id: 'Qwen2.5-1.5B-Instruct-q4f16_1-MLC',
     name: 'Qwen 2.5 1.5B',
     description: 'Strong multilingual model with good reasoning and coding performance.',

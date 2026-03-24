@@ -22,10 +22,17 @@ export interface CitadelChatResponse {
   runtimeStats: string;
 }
 
+export const DEFAULT_ASSISTANT_SYSTEM_PROMPT = [
+  'Keep answers concise but detailed.',
+  'Add a confidence score at the end of every response in this exact format: Confidence: X%',
+  '100% is full confidence, and 0% is no confidence.',
+].join('\n');
+
 export interface CitadelAppSettings {
   selectedModelId: string;
   setupComplete: boolean;
   autoLoadModel: boolean;
+  systemPrompt: string;
 }
 
 export type BrowserKind = 'chrome' | 'edge' | 'firefox' | 'safari' | 'opera' | 'other';
