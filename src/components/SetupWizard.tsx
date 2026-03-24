@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
 
 import { useCitadel } from '@/contexts/CitadelContext';
+import { useIsMobile } from '@/hooks/useIsMobile';
 import { KNOWLEDGE_PACKS, KNOWLEDGE_PRESETS } from '@/lib/knowledge-packs';
-import { formatBytes } from '@/lib/webllm-models';
+import { filterModelsForDevice, formatBytes } from '@/lib/webllm-models';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -28,10 +29,14 @@ export function SetupWizard({ onComplete }: SetupWizardProps) {
     runtimeCompatibility,
     runtimeModelSupport,
   } = useCitadel();
+  const isMobile = useIsMobile();
 
   const modelsToOffer = useMemo(
-    () => availableModels.filter(model => runtimeModelSupport[model.id] !== false),
-    [availableModels, runtimeModelSupport],
+    () => filterModelsForDevice(
+      availableModels.filter(model => runtimeModelSupport[model.id] !== false),
+      isMobile,
+    ),
+    [availableModels, runtimeModelSupport, isMobile],
   );
 
   const defaultPackIds = useMemo(
@@ -164,6 +169,9 @@ export function SetupWizard({ onComplete }: SetupWizardProps) {
               <p className="mt-3 text-sm text-muted-foreground">
                 pick a local model for offline chat. you can switch models later in settings.
               </p>
+              {isMobile && (
+                <p className="mt-2 text-xs text-muted-foreground">more powerful models available on desktop</p>
+              )}
 
               <button
                 type="button"
