@@ -75,6 +75,11 @@ export function SetupWizard({ onComplete }: SetupWizardProps) {
 
   const totalDownloadBytes = (selectedModel?.sizeBytes ?? 0) + totalKnowledgeBytes;
 
+  const hasAllKnowledgePacksSelected = useMemo(
+    () => KNOWLEDGE_PACKS.every(pack => selectedPackIds.includes(pack.id)),
+    [selectedPackIds],
+  );
+
   function togglePack(packId: string, enabled: boolean) {
     setSelectedPackIds((current) => {
       if (enabled) {
@@ -82,6 +87,10 @@ export function SetupWizard({ onComplete }: SetupWizardProps) {
       }
       return current.filter(id => id !== packId);
     });
+  }
+
+  function handleToggleAllKnowledgePacks(enabled: boolean) {
+    setSelectedPackIds(enabled ? KNOWLEDGE_PACKS.map(pack => pack.id) : []);
   }
 
   async function handleRunBenchmark() {
@@ -227,7 +236,16 @@ export function SetupWizard({ onComplete }: SetupWizardProps) {
                 choose the offline references you want available in chat.
               </p>
 
-              <ul className="mt-8 divide-y divide-border/70 border-y border-border/70">
+              <div className="mt-6 flex items-center justify-between border-b border-border/70 pb-3">
+                <p className="text-sm">select all knowledge packs</p>
+                <Switch
+                  checked={hasAllKnowledgePacksSelected}
+                  onCheckedChange={handleToggleAllKnowledgePacks}
+                  aria-label="Select all knowledge packs"
+                />
+              </div>
+
+              <ul className="mt-2 divide-y divide-border/70 border-y border-border/70">
                 {KNOWLEDGE_PACKS.map(pack => {
                   const enabled = selectedPackIds.includes(pack.id);
 
