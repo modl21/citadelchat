@@ -1332,7 +1332,7 @@ function renderMarkdownLite(content: string): ReactNode {
       continue;
     }
 
-    const ordered = trimmed.match(/^(\d+)\.\s+(.*)$/);
+    const ordered = trimmed.match(/^(\d+)[.)]\s*(.*)$/);
     if (ordered) {
       flushParagraph();
 
