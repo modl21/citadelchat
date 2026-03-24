@@ -1,0 +1,48 @@
+{
+  "id": "community-governance",
+  "title": "Community Governance and Dispute Resolution",
+  "version": "1.0.0",
+  "updatedAt": "2026-03-24",
+  "documents": [
+    {
+      "id": "charter-basics",
+      "title": "Minimal Community Charter",
+      "content": "Create a short written charter covering membership expectations, shared responsibilities, decision process, and consequences for harmful behavior. Keep it readable in one page so everyone can understand and recall it under stress. Revisit on a fixed schedule rather than changing rules in the middle of conflict."
+    },
+    {
+      "id": "roles-and-rotation",
+      "title": "Roles, Rotation, and Burnout Prevention",
+      "content": "Define essential functions such as water, food, medical, security, education, logistics, and records. Assign backups for every role and rotate high-stress duties to prevent concentration of power and burnout. Communities fail when key knowledge lives in one person only."
+    },
+    {
+      "id": "meeting-protocol",
+      "title": "Decision Meetings Under Pressure",
+      "content": "Use a fixed agenda: situation update, risks, options, decision, owner, deadline. Time-box debates and record final decisions with who approved them. For urgent issues, use a predefined emergency authority window and require post-incident review to prevent abuse."
+    },
+    {
+      "id": "conflict-resolution-ladder",
+      "title": "Conflict Resolution Ladder",
+      "content": "Start with private de-escalation, then mediated conversation, then small council review, then full community process if needed. Keep accusations specific and evidence-based. Separate immediate safety actions from long-term social repair so crises do not turn into permanent factionalism."
+    },
+    {
+      "id": "resource-allocation",
+      "title": "Scarcity Allocation Rules",
+      "content": "Define clear priority tiers for life-critical resources before shortages occur: drinking water, medical care, sanitation, and staple calories first. Publish ration triggers and review dates publicly. Transparent allocation is the strongest protection against rumor and hoarding cycles."
+    },
+    {
+      "id": "accountability-records",
+      "title": "Records and Accountability",
+      "content": "Maintain paper-first logs for inventory, incidents, decisions, and commitments. Use simple formats with dates and signatures to reduce disputes. Shared records preserve institutional memory when internet, power, or leadership continuity is unstable."
+    },
+    {
+      "id": "external-relations",
+      "title": "Inter-Community Relations",
+      "content": "Maintain predictable contact protocols with neighboring groups: who speaks, where meetings occur, and what topics require larger council approval. Exchange maps of water points, medical capacity, and hazard zones where trust allows. Stable external relations reduce security costs over time."
+    },
+    {
+      "id": "youth-and-vulnerable-protection",
+      "title": "Protection Standards for Youth and Vulnerable Members",
+      "content": "Adopt explicit protections for children, elderly, disabled, and medically fragile members. Require at least two trusted adults for high-risk caregiving tasks and maintain safeguarding reporting channels. Communities that protect vulnerable people retain cohesion and legitimacy."
+    }
+  ]
+}

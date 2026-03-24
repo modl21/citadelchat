@@ -1,28 +1,33 @@
 {
   "id": "trade-barter",
   "title": "Post-Collapse Economics & Security",
-  "version": "1.0.0",
-  "updatedAt": "2026-03-23",
+  "version": "1.1.0",
+  "updatedAt": "2026-03-24",
   "documents": [
     {
       "id": "barter-items",
-      "title": "High-Value Barter Items",
-      "content": "When fiat currency fails, functional value rules. Tier 1 Barter: Medical supplies (antibiotics, painkillers), water filters, salt (for preservation). Tier 2: Ammunition (standard calibers like 9mm, 5.56, .22LR, 12ga), seeds, batteries, lighters. Tier 3: Vices (alcohol, tobacco, coffee). Do not trade away your primary means of defense or survival."
+      "title": "Barter Value Basics",
+      "content": "In unstable economies, durable utility tends to hold value: water treatment supplies, medicines, hygiene goods, repair parts, seeds, fuel, and common batteries. Protect core life-support inventory first and never trade away essentials you cannot replace."
     },
     {
       "id": "trade-security",
-      "title": "Trade Security Protocol",
-      "content": "Never trade at your base camp or home (OPSEC). Establish a neutral, open location. Do not bring your entire supply. Implement overwatch: have hidden, armed community members watching the trade location. Never show desperation during negotiations."
+      "title": "Safer Trade Procedures",
+      "content": "Use neutral meeting points, daylight exchanges, and simple written transaction records when possible. Avoid revealing full inventory or home location. Conduct trades with at least one trusted partner and keep exits visible."
     },
     {
       "id": "community-defense",
-      "title": "Community Defense Architecture",
-      "content": "A lone wolf eventually sleeps. You must form a community. Establish layers of security: 1) Early Warning (dogs, trip flares, scouts). 2) Obstacles (felled trees, barricades, funneling terrain). 3) Hardened cover (sandbags, reinforced walls). Implement a 24/7 watch rotation. Share resources to prevent internal friction."
+      "title": "Community Stability Principles",
+      "content": "Long-term resilience depends on trust, fair process, and mutual aid. Establish transparent rules for conflict resolution, shared labor, and scarcity allocation. Stable communities usually outperform isolated households in security and recovery."
     },
     {
-      "id": "grey-man",
-      "title": "The 'Grey Man' Concept",
-      "content": "Blend into the baseline environment. Do not wear tactical gear in an urban refugee setting. Do not appear well-fed or overly clean when everyone else is starving and filthy. Carry your gear in nondescript bags. Speak quietly, break eye contact, and appear entirely unremarkable to avoid drawing the attention of predators or desperate crowds."
+      "id": "opsec-basics",
+      "title": "Operational Security Basics",
+      "content": "Keep sensitive information on a need-to-know basis. Avoid predictable routines for high-value movement. Minimize visible signs of exceptional stockpiles during periods of instability to reduce targeting risk."
+    },
+    {
+      "id": "local-ledger",
+      "title": "Local Ledger and Credit Systems",
+      "content": "If cash systems degrade, communities can maintain exchange with simple ledgers, vouchers, or time-banking. Keep records auditable and publicly verifiable to preserve trust. Standardize units of value and review balances routinely."
     }
   ]
 }

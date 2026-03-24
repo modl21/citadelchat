@@ -1,38 +1,43 @@
 {
   "id": "long-term-agriculture",
   "title": "Agriculture and Ecosystems",
-  "version": "1.0.0",
-  "updatedAt": "2026-03-23",
+  "version": "1.1.0",
+  "updatedAt": "2026-03-24",
   "documents": [
     {
       "id": "seed-saving",
       "title": "Seed Saving and Storage",
-      "content": "Only heirloom (open-pollinated) seeds breed true. Hybrids will revert to unpredictable traits. Allow fruiting vegetables (tomatoes, cucumbers) to over-ripen on the vine, extract seeds, ferment in water for 3 days to remove germination-inhibiting gel, then rinse and dry thoroughly. Store all seeds in a cool, dark, dry place (glass jars with desiccant)."
+      "content": "Open-pollinated seeds are best for long-term seed saving because they reproduce true to type when isolated properly. Harvest mature seeds from healthy plants, clean and dry them thoroughly, then store in cool, dark, low-humidity conditions with clear labels for crop, variety, and year."
     },
     {
-      "id": "composting-humanure",
-      "title": "Composting and Humanure",
-      "content": "Maintain a carbon-to-nitrogen ratio of 30:1. Carbon (browns): dried leaves, straw, sawdust. Nitrogen (greens): food scraps, fresh grass, manure. Turn regularly to aerate and maintain aerobic decomposition. Human waste (humanure) MUST be composted separately in a specialized bin, reaching 122°F (50°C) for a week to kill pathogens, and must cure for a minimum of 1 full year before use on non-root food crops."
+      "id": "composting-basics",
+      "title": "Composting Basics",
+      "content": "Maintain a balanced compost mix of carbon-rich material (dry leaves, straw, paper) and nitrogen-rich material (fresh plant scraps, manure from healthy animals). Keep moisture around a wrung-out sponge level and turn for airflow. If compost smells rotten, add dry carbon and aerate."
+    },
+    {
+      "id": "human-waste-safety",
+      "title": "Human Waste Compost Safety",
+      "content": "Human waste can carry dangerous pathogens and must be managed with strict separation, controlled compost process, and long maturation before any reuse. Follow proven public-health guidance for your climate and system design. If safe processing cannot be guaranteed, do not use human-waste compost on food crops."
     },
     {
       "id": "crop-rotation",
-      "title": "Crop Rotation and Guilds",
-      "content": "Never plant the same crop family in the same soil two years in a row to prevent pest buildup and soil depletion. Use the 'Three Sisters' guild: Corn provides a stalk for Beans to climb, Beans fix nitrogen into the soil, and Squash provides ground cover to retain moisture and deter weeds."
+      "title": "Crop Rotation and Companion Planting",
+      "content": "Rotate crop families across beds each season to reduce pests and nutrient depletion. Use companion planting for support and ground cover, but verify local conditions rather than relying on universal formulas. Record outcomes each season so planting plans improve over time."
     },
     {
       "id": "root-cellars",
-      "title": "Root Cellars and Winter Storage",
-      "content": "Root cellars preserve harvests without electricity. Ideal conditions are 32-40°F (0-4°C) with 85-95% humidity. Dig below the frost line. Provide intake ventilation low to the ground and exhaust ventilation near the ceiling. Store apples away from potatoes to prevent ethylene gas spoilage. Pack carrots and beets in damp sand or sawdust."
+      "title": "Root Cellars and Cool Storage",
+      "content": "Cool, stable, humid storage extends shelf life without electricity. Separate produce types that release ethylene (like apples) from crops sensitive to it. Inspect storage weekly and remove spoiled produce quickly to protect the rest."
     },
     {
-      "id": "animal-husbandry",
-      "title": "Small Animal Husbandry",
-      "content": "Chickens: Provide extreme value through eggs, pest control, and manure; require high calcium and grit. Rabbits: Highest feed-to-meat conversion ratio; feed on forage and grass, breed rapidly, but meat is excessively lean (beware 'rabbit starvation' or protein poisoning without added fats). Goats: Excellent foragers for brush clearing, provide milk and meat, but require extremely robust fencing."
+      "id": "small-livestock",
+      "title": "Small Livestock Planning",
+      "content": "Choose animals based on available feed, shelter, climate, and labor. Build routines for water, disease observation, breeding control, and manure handling. Diversify food sources and avoid dependence on a single animal type."
     },
     {
-      "id": "foraging-rules",
-      "title": "Wild Foraging Rules",
-      "content": "Never consume an unidentified plant. Follow the Universal Edibility Test ONLY in absolute desperation: separate plant into parts (root, stem, leaf), smell for almonds/peaches (cyanide), rub on wrist (wait 15 mins), rub on lip (wait 15 mins), chew small piece and hold in mouth (15 mins), swallow and wait 8 hours. If any burning, itching, or nausea occurs, discard immediately."
+      "id": "foraging-safety",
+      "title": "Wild Foraging Safety",
+      "content": "Never consume an unidentified plant or mushroom. Use multiple identification traits and, if possible, a second knowledgeable confirmation. Learn and prioritize a short list of high-confidence local species before expanding your foraging range."
     }
   ]
 }

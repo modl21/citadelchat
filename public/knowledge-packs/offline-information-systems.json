@@ -1,0 +1,48 @@
+{
+  "id": "offline-information-systems",
+  "title": "Offline Information Systems and Mesh Services",
+  "version": "1.0.0",
+  "updatedAt": "2026-03-24",
+  "documents": [
+    {
+      "id": "service-priority",
+      "title": "Local Service Priority Stack",
+      "content": "When internet is intermittent, prioritize local services that preserve function: messaging relay, incident board, map mirror, medical protocols, inventory dashboard, and document library. Design for text-first interfaces that remain usable on low bandwidth and old hardware."
+    },
+    {
+      "id": "mesh-topology",
+      "title": "Mesh Topology Planning",
+      "content": "Use a hybrid mesh with neighborhood nodes and a few backbone links between high points. Avoid single points of failure by ensuring every critical site has at least two independent paths. Validate topology with periodic link-failure drills."
+    },
+    {
+      "id": "sneakernet-workflows",
+      "title": "Sneakernet and Data Courier Workflow",
+      "content": "For disconnected zones, move updates via encrypted removable media with signed manifests and checksum verification. Keep write-once update bundles and rollback copies. Physical data courier routes should be scheduled and logged just like supply convoys."
+    },
+    {
+      "id": "offline-maps-and-gazetteer",
+      "title": "Offline Maps and Gazetteers",
+      "content": "Store regional maps locally in multiple formats (raster, vector, printed). Maintain a gazetteer index listing water points, clinics, shelters, bridges, fuel, and hazards. Update map notes after field patrols and version them so outdated copies are easy to identify."
+    },
+    {
+      "id": "identity-and-access",
+      "title": "Identity and Access in Low-Infra Environments",
+      "content": "Use role-based accounts for local services and avoid shared admin credentials. Keep emergency break-glass credentials sealed and audited. Rotate credentials after personnel changes, and maintain paper backup procedures in case systems become unavailable."
+    },
+    {
+      "id": "backup-3-2-1",
+      "title": "3-2-1 Backups Without Cloud",
+      "content": "Keep three copies of critical data, on two different media types, with one physically separated copy. Test restore procedures monthly. Backups are not real until restored successfully under realistic constraints."
+    },
+    {
+      "id": "integrity-checks",
+      "title": "File Integrity and Update Safety",
+      "content": "Use checksums and signed release notes for updates to prevent corruption and tampering. Deploy updates in stages: pilot node first, then wider rollout. Keep prior known-good versions to enable fast rollback if failures appear."
+    },
+    {
+      "id": "community-info-governance",
+      "title": "Information Governance and Trust",
+      "content": "Define who can publish alerts, medical advisories, and movement notices. Label all critical posts with source, timestamp, and expiration window. Misinformation spreads fastest during uncertainty; clear governance and versioned updates reduce panic."
+    }
+  ]
+}

@@ -1,18 +1,18 @@
 {
   "id": "comms-navigation",
   "title": "Communications and Navigation",
-  "version": "1.0.0",
-  "updatedAt": "2026-03-23",
+  "version": "1.1.0",
+  "updatedAt": "2026-03-24",
   "documents": [
     {
       "id": "radio-discipline",
       "title": "Radio Discipline Fundamentals",
-      "content": "Keep transmissions short, structured, and purposeful. Use agreed call signs and authentication words. Confirm critical details by read-back. Avoid unnecessary chatter. Schedule radio checks and fallback windows."
+      "content": "Keep transmissions short, structured, and purposeful. Use agreed call signs and authentication words. Confirm critical details by read-back. Avoid unnecessary chatter. Schedule radio checks and fallback windows so silence does not create confusion."
     },
     {
       "id": "message-format",
       "title": "Standard Message Format",
-      "content": "Use concise sequence: Who you are calling, who you are, priority, location, request, and acknowledgment needed. Repeat coordinates carefully. For emergency traffic, mark as immediate and maintain channel clear until resolved."
+      "content": "Use concise sequence: who you are calling, who you are, priority, location, request, and acknowledgment needed. Repeat coordinates carefully. For emergency traffic, mark as immediate and keep channel clear until resolved."
     },
     {
       "id": "signal-plans",
@@ -35,9 +35,24 @@
       "content": "Reduce silhouette and noise signatures. Use red light only when necessary and shield beams. Keep interval spacing and periodic accountability halts. Avoid crossing exposed terrain unless timing and concealment are favorable."
     },
     {
+      "id": "mesh-network-basics",
+      "title": "Mesh Networking Basics",
+      "content": "A mesh network links many local nodes so data can hop from node to node without a central internet provider. Plan for short links with line-of-sight where possible, and design redundancy so one failed node does not isolate the whole group. Keep a paper map of node names, locations, power source, and responsible operator."
+    },
+    {
+      "id": "mesh-node-placement",
+      "title": "Node Placement and Link Quality",
+      "content": "Prioritize high, stable mounting points with clear path to neighboring nodes. Trees and weather can change link quality over time, so test links in poor conditions, not only clear days. Use directional antennas for long point-to-point links and omnidirectional antennas for local neighborhood coverage."
+    },
+    {
+      "id": "mesh-operations",
+      "title": "Mesh Network Operations and Security",
+      "content": "Assign maintainers for each node and enforce simple change control: document firmware versions, keys, and config backups before updates. Segment sensitive traffic from public bulletin traffic. Use strong admin credentials, encrypted management access, and routine key rotation. Keep local services such as community bulletin boards, map mirrors, and text-only knowledge libraries available even when upstream internet fails."
+    },
+    {
       "id": "comms-resilience",
       "title": "Comms Resilience Planning",
-      "content": "Plan layered comms: primary radio, secondary frequency, tertiary runner/signals. Maintain spare power budget and spare antennas/connectors. Drill failure scenarios monthly to keep procedures automatic."
+      "content": "Plan layered comms: primary radio, secondary frequency, tertiary runner/signals, and local mesh for non-urgent coordination. Maintain spare power budget and spare antennas/connectors. Drill failure scenarios monthly to keep procedures automatic."
     }
   ]
 }

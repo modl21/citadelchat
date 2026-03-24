@@ -1,33 +1,38 @@
 {
   "id": "off-grid-medicine",
   "title": "Off-Grid Long-Term Medicine",
-  "version": "1.0.0",
-  "updatedAt": "2026-03-23",
+  "version": "1.1.0",
+  "updatedAt": "2026-03-24",
   "documents": [
     {
-      "id": "antibiotic-alternatives",
-      "title": "Antibiotic Alternatives and Usage",
-      "content": "Reserve true antibiotics for potentially lethal infections (sepsis, severe pneumonia). Never under-dose—finish the full course to prevent creating resistant superbugs. If antibiotics run out: honey (especially Manuka) on wounds creates an osmotic barrier, iodine inhibits bacterial growth topically, and heavily diluted bleach (Dakin's solution) can sanitize severe surface wounds."
+      "id": "infection-triage",
+      "title": "Infection Triage Priorities",
+      "content": "Escalate rapidly for signs of severe infection: persistent high fever, confusion, breathing difficulty, rapidly spreading redness, severe dehydration, or inability to keep fluids down. Early recognition and supportive care can prevent deterioration when formal care is delayed."
+    },
+    {
+      "id": "wound-care",
+      "title": "Wound Cleaning and Monitoring",
+      "content": "Clean wounds with safe water or sterile saline, remove visible debris, and apply clean dressings. Re-check daily for increased pain, swelling, heat, pus, red streaking, or fever. Do not close contaminated wounds unless directed by a qualified clinician."
+    },
+    {
+      "id": "rehydration",
+      "title": "Oral Rehydration for GI Illness",
+      "content": "For diarrhea or vomiting, focus on hydration early. Standard oral rehydration mix: 1 liter safe water, 6 level teaspoons sugar, 0.5 level teaspoon salt. Give small frequent sips and monitor urine output, mental status, and ability to drink."
     },
     {
       "id": "dental-emergencies",
-      "title": "Field Dental Emergencies",
-      "content": "A tooth abscess can become a lethal brain/blood infection. Treat severe pain with clove oil (eugenol) applied directly to the cavity. If extraction is unavoidable: numb if possible, detach the gum with a sharp sterile tool, push tooth back and forth to break periodontal ligaments—do not pull straight out or roots will snap. Pack socket with sterile gauze."
+      "title": "Dental Emergency Stabilization",
+      "content": "Dental infections can become systemic emergencies. Prioritize pain control, gentle oral hygiene, and urgent referral pathways. Track swelling progression, fever, and swallowing/breathing changes as high-risk warning signs."
     },
     {
-      "id": "childbirth",
-      "title": "Unassisted Childbirth basics",
-      "content": "Prepare a clean environment. Do NOT pull on the baby during delivery. Support the perineum to prevent tearing. After birth, clear the baby's airway (mouth then nose). Keep the baby warm and place skin-to-skin immediately. Do not pull the umbilical cord; wait for the placenta to birth naturally (usually 10-30 mins). Tie off the cord tightly in two places and cut between them with a sterilized blade."
+      "id": "pregnancy-postpartum",
+      "title": "Pregnancy and Postpartum Red Flags",
+      "content": "Seek urgent help for heavy bleeding, severe abdominal pain, persistent high blood pressure symptoms, fever, seizures, or reduced fetal movement. Prepare clean delivery and newborn warming supplies in advance, but escalate quickly when complications appear."
     },
     {
-      "id": "waterborne-diseases",
-      "title": "Waterborne Disease Management",
-      "content": "Cholera, dysentery, and Giardia kill via severe dehydration. Do not use anti-diarrheal drugs immediately; the body is flushing pathogens. Instead, constantly administer Oral Rehydration Salts (ORS): 1 liter safe water, 6 level teaspoons sugar, 0.5 level teaspoon salt. Sip slowly to prevent vomiting."
-    },
-    {
-      "id": "wound-closure",
-      "title": "Wound Closure Decisions",
-      "content": "Do NOT suture a dirty wound, an animal/human bite, or a puncture wound. Closing bacteria inside leads to lethal infections. Leave dirty wounds open, pack with sterile gauze wet with saline, and change daily (let it heal from the bottom up). Only suture or superglue clean, straight lacerations within 6-8 hours of injury."
+      "id": "medication-safety",
+      "title": "Medication and Antimicrobial Stewardship",
+      "content": "Do not use antibiotics casually or partially. Use them only when clearly indicated and from reliable guidance to reduce harm and resistance risk. Track drug name, dose, timing, allergies, and response in a written log."
     }
   ]
 }

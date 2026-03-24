@@ -1,4 +1,4 @@
-const CACHE_NAME = 'citadel-chat-cache-v5';
+const CACHE_NAME = 'citadel-chat-cache-v6';
 const OFFLINE_ASSETS = [
   '/',
   '/index.html',
@@ -19,6 +19,9 @@ const OFFLINE_ASSETS = [
   '/knowledge-packs/mechanical-repair.json',
   '/knowledge-packs/fuel-heat-cooking.json',
   '/knowledge-packs/water-systems.json',
+  '/knowledge-packs/community-governance.json',
+  '/knowledge-packs/offline-information-systems.json',
+  '/knowledge-packs/education-skill-transfer.json',
 ];
 
 async function warmOfflineAssets() {

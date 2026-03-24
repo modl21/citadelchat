@@ -1,33 +1,38 @@
 {
-  "id": "chemical-biological-radiological",
+  "id": "cbrn-survival",
   "title": "CBRN Survival",
-  "version": "1.0.0",
-  "updatedAt": "2026-03-23",
+  "version": "1.1.0",
+  "updatedAt": "2026-03-24",
   "documents": [
     {
       "id": "radiation-protection",
       "title": "Radiation: Time, Distance, Shielding",
-      "content": "Minimize TIME exposed. Maximize DISTANCE from the source. Maximize SHIELDING (thick concrete, packed earth, deep water). In a fallout event, shelter in the center-most room of the lowest floor (preferably basement). Do not exit for at least 48 to 72 hours (the 'Rule of Sevens' dictates a tenfold decrease in radiation every sevenfold increase in time)."
+      "content": "Core radiation protection principles are time, distance, and shielding: reduce exposure time, increase distance from sources, and use dense shielding such as concrete or packed earth. Shelter plans should be prepared before emergencies and include food, water, and sanitation for sustained indoor stay."
     },
     {
       "id": "fallout-decontamination",
       "title": "Fallout Decontamination",
-      "content": "If caught outside, remove outer clothing before entering a clean shelter (removes 90% of radioactive dust). Wash hair and body with soap and running water. DO NOT use hair conditioner—it binds radioactive particles to the hair. Bag and distance contaminated clothing."
+      "content": "If potentially contaminated, remove outer clothing before entering clean shelter areas, bag contaminated items, and wash exposed skin and hair with soap and water. Avoid skin abrasion while washing. Keep clean and dirty zones physically separated to reduce secondary contamination."
     },
     {
       "id": "potassium-iodide",
-      "title": "Potassium Iodide (KI) Usage",
-      "content": "KI only prevents the thyroid from absorbing radioactive iodine (I-131). It does NOT protect against general radiation or other isotopes. Take only when explicitly instructed or immediately following an event involving nuclear power or fallout. Dosage must follow strict local guidelines to avoid severe side effects."
+      "title": "Potassium Iodide (KI) Scope",
+      "content": "KI helps block thyroid uptake of radioactive iodine only. It does not protect against many other radionuclides or external radiation. Use only according to trusted public-health or radiation-authority guidance and dosage recommendations."
     },
     {
       "id": "biological-isolation",
       "title": "Biological Threat Isolation",
-      "content": "Create a 'clean room' with plastic sheeting and duct tape over doors and vents. Maintain positive air pressure if possible. Use an N95 or better respirator mask if moving through contaminated zones. Disinfect returning equipment with a 1:10 bleach-to-water solution with a contact time of 10-15 minutes."
+      "content": "Use layered infection control: isolate symptomatic individuals, improve ventilation, reduce crowding, enforce hand hygiene, and disinfect high-touch surfaces. Keep simple symptom logs to detect spread early and separate caregiver workflows from food and water tasks."
     },
     {
       "id": "chemical-indicators",
-      "title": "Chemical Threat Indicators",
-      "content": "Look for unexplained mass casualties, dead wildlife/birds in unusual numbers, unusual liquid droplets, strange odors (garlic, newly mown hay, bitter almonds), or low-lying clouds/fog. Move upwind and to higher ground immediately, as most dangerous chemical agents are heavier than air and settle in valleys or basements."
+      "title": "Chemical Exposure Indicators",
+      "content": "Potential indicators include sudden unexplained symptoms in multiple people, unusual odors, visible aerosols or droplets, and distressed wildlife. Move away from source area, favor fresh air and elevation when appropriate, and avoid direct contact with unknown residues."
+    },
+    {
+      "id": "household-decon-limitations",
+      "title": "Household Decontamination Limitations",
+      "content": "Household bleach is useful for many surface disinfection tasks but concentration, contact time, and material compatibility matter. Never mix bleach with ammonia or acids. For serious CBRN incidents, improvised methods are limited; prioritize evacuation, isolation, and official hazard guidance when available."
     }
   ]
 }

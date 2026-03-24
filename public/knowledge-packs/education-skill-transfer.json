@@ -1,0 +1,43 @@
+{
+  "id": "education-skill-transfer",
+  "title": "Education and Skill Transfer",
+  "version": "1.0.0",
+  "updatedAt": "2026-03-24",
+  "documents": [
+    {
+      "id": "core-curriculum",
+      "title": "Core Resilience Curriculum",
+      "content": "Maintain a core training cycle for all members: water safety, first aid, sanitation, food systems, comms basics, conflict de-escalation, and tool safety. Keep modules short, repeatable, and practical so new members can onboard quickly."
+    },
+    {
+      "id": "apprenticeship-model",
+      "title": "Apprenticeship and Cross-Training",
+      "content": "Pair less-experienced members with role leads for time-boxed apprenticeship blocks. Cross-train at least two backups for each critical skill area. Skill redundancy is essential for continuity when people are sick, injured, or displaced."
+    },
+    {
+      "id": "offline-library-design",
+      "title": "Offline Library Curation",
+      "content": "Build a layered library: quick-reference checklists, intermediate manuals, and deep technical references. Store digital and printed copies. Tag each resource by domain and difficulty so users can find actionable guidance quickly under stress."
+    },
+    {
+      "id": "drill-schedule",
+      "title": "Drills and Competency Validation",
+      "content": "Run recurring drills for medical response, water contamination, fire response, communications loss, and supply disruption. Measure performance against simple checklists and capture lessons learned after each drill. Improvement requires tracked feedback loops."
+    },
+    {
+      "id": "youth-education-continuity",
+      "title": "Youth Education Continuity",
+      "content": "Preserve literacy, numeracy, practical science, and civic problem-solving for children and adolescents. Keep routines predictable and include applied projects tied to community needs. Continuity of learning is a long-term stabilizer during institutional decline."
+    },
+    {
+      "id": "knowledge-capture",
+      "title": "Capturing Local Knowledge",
+      "content": "Document local climate patterns, soil behavior, disease trends, repair fixes, and negotiation outcomes in a shared logbook. Encourage after-action writeups by domain leads. Local experience becomes strategic advantage when external systems are unreliable."
+    },
+    {
+      "id": "leadership-development",
+      "title": "Leadership Pipeline",
+      "content": "Train future coordinators in communication, decision structure, ethics, and incident management. Rotate meeting facilitation and logistics tasks to build confidence. Communities thrive when leadership is distributed, accountable, and replaceable."
+    }
+  ]
+}
