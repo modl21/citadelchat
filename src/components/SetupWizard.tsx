@@ -162,7 +162,7 @@ export function SetupWizard({ onComplete }: SetupWizardProps) {
             <section>
               <h1 className="text-2xl font-semibold tracking-tight">choose your model</h1>
               <p className="mt-3 text-sm text-muted-foreground">
-                Pick one local model for offline chat. You can switch models later in settings.
+                pick one local model for offline chat. you can switch models later in settings.
               </p>
 
               <button
@@ -216,7 +216,7 @@ export function SetupWizard({ onComplete }: SetupWizardProps) {
             <section>
               <h1 className="text-2xl font-semibold tracking-tight">select knowledge packs</h1>
               <p className="mt-3 text-sm text-muted-foreground">
-                Choose the offline references you want available in chat.
+                choose the offline references you want available in chat.
               </p>
 
               <ul className="mt-8 divide-y divide-border/70 border-y border-border/70">
