@@ -1,10 +1,11 @@
-const CACHE_NAME = 'citadel-chat-cache-v6';
+const CACHE_NAME = 'citadel-chat-cache-v7';
 const OFFLINE_ASSETS = [
   '/',
   '/index.html',
   '/manifest.webmanifest',
   '/citadel-logo.jpg',
   '/citadeli.jpg',
+  '/icon-maskable-512.png',
   '/odell-badge.jpg',
   '/knowledge-packs/emergency-medical.json',
   '/knowledge-packs/water-food.json',
