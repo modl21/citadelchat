@@ -139,32 +139,58 @@ export default function Index() {
         </aside>
 
         <main className="relative flex min-h-screen flex-1 flex-col">
-          <div className="absolute left-3 top-3 z-20 md:hidden">
-            <Sheet open={mobileRailOpen} onOpenChange={setMobileRailOpen}>
-              <SheetTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-9 w-9 rounded-md border border-border/70 bg-background/85 text-muted-foreground"
-                  aria-label="Open navigation"
-                >
-                  <Menu className="size-4" />
-                </Button>
-              </SheetTrigger>
-              <SheetContent side="left" className="w-full max-w-none border-r border-border/80 bg-sidebar p-0">
-                <NavigationRail
-                  view={view}
-                  onViewChange={(nextView) => {
-                    setView(nextView);
-                    setMobileRailOpen(false);
-                  }}
-                />
-              </SheetContent>
-            </Sheet>
-          </div>
+          <header className="flex h-14 shrink-0 items-center border-b border-border/70 px-3 md:px-6 lg:px-8">
+            <div className="flex items-center gap-2">
+              <Sheet open={mobileRailOpen} onOpenChange={setMobileRailOpen}>
+                <SheetTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 rounded-md border border-border/70 text-muted-foreground md:hidden"
+                    aria-label="Open navigation"
+                  >
+                    <Menu className="size-4" />
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side="left" className="w-full max-w-none border-r border-border/80 bg-sidebar p-0">
+                  <NavigationRail
+                    view={view}
+                    onViewChange={(nextView) => {
+                      setView(nextView);
+                      setMobileRailOpen(false);
+                    }}
+                  />
+                </SheetContent>
+              </Sheet>
+
+              <a
+                href="https://citadelwire.com"
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center rounded-full border border-border/70 p-0.5 transition-colors hover:border-primary"
+                aria-label="Citadel"
+              >
+                <img src="/citadel-logo.jpg" alt="Citadel" className="h-7 w-7 rounded-full object-cover" />
+              </a>
+            </div>
+
+            <div className="min-w-0 flex-1 px-2 text-center">
+              <h1 className="truncate text-sm font-semibold tracking-tight">citadel chat: your offline citadel brain</h1>
+            </div>
+
+            <a
+              href="https://odell.xyz"
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-2 rounded-full border border-border/70 px-2 py-1 text-[11px] text-muted-foreground transition-colors hover:border-primary hover:text-foreground"
+            >
+              <img src="/odell-badge.jpg" alt="ODELL" className="h-5 w-5 rounded-full object-cover" />
+              <span className="hidden sm:inline">curated by ODELL</span>
+            </a>
+          </header>
 
           {view === 'chat' && (
-            <section className="flex h-screen min-h-screen flex-col px-5 pb-6 pt-14 md:px-12 md:pb-8 md:pt-8 lg:px-16">
+            <section className="flex min-h-0 flex-1 flex-col px-5 pb-6 pt-4 md:px-12 md:pb-8 md:pt-6 lg:px-16">
               <div className="mx-auto flex w-full max-w-4xl flex-1 min-h-0 flex-col">
                 <div className="flex-1 overflow-y-auto">
                   <div className="space-y-8 pb-6">
@@ -225,7 +251,7 @@ export default function Index() {
           )}
 
           {view === 'library' && (
-            <section className="h-screen overflow-y-auto px-5 pb-10 pt-14 md:px-12 md:pt-10 lg:px-16">
+            <section className="min-h-0 flex-1 overflow-y-auto px-5 pb-10 pt-4 md:px-12 md:pt-6 lg:px-16">
               <div className="mx-auto w-full max-w-3xl">
                 <h1 className="text-base font-semibold tracking-tight">library</h1>
                 <p className="mt-2 text-sm text-muted-foreground">Downloaded packs live in browser storage and remain available offline.</p>
@@ -261,7 +287,7 @@ export default function Index() {
           )}
 
           {view === 'settings' && (
-            <section className="h-screen overflow-y-auto px-5 pb-10 pt-14 md:px-12 md:pt-10 lg:px-16">
+            <section className="min-h-0 flex-1 overflow-y-auto px-5 pb-10 pt-4 md:px-12 md:pt-6 lg:px-16">
               <div className="mx-auto w-full max-w-3xl">
                 <h1 className="text-base font-semibold tracking-tight">settings</h1>
 
@@ -397,18 +423,10 @@ export default function Index() {
                   </section>
                 </div>
 
-                <footer className="mt-16 space-y-2 pb-4 text-xs text-muted-foreground/80">
-                  <p>
-                    curated by{' '}
-                    <a href="https://odell.xyz" target="_blank" rel="noreferrer" className="underline underline-offset-4">
-                      ODELL
-                    </a>
-                  </p>
-                  <p>
-                    <a href="https://shakespeare.diy" target="_blank" rel="noreferrer" className="underline underline-offset-4">
-                      Vibed with Shakespeare
-                    </a>
-                  </p>
+                <footer className="mt-16 pb-4 text-xs text-muted-foreground/80">
+                  <a href="https://shakespeare.diy" target="_blank" rel="noreferrer" className="underline underline-offset-4">
+                    Vibed with Shakespeare
+                  </a>
                 </footer>
               </div>
             </section>
