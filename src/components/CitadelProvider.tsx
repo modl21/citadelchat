@@ -10,6 +10,7 @@ import {
 
 import {
   CitadelContext,
+  DEFAULT_ASSISTANT_SYSTEM_PROMPT,
   type CitadelAppSettings,
   type BenchmarkResult,
   type BrowserKind,
@@ -37,6 +38,7 @@ const SETTINGS_KEY = {
   selectedModelId: 'citadel.selectedModelId',
   setupComplete: 'citadel.setupComplete',
   autoLoadModel: 'citadel.autoLoadModel',
+  systemPrompt: 'citadel.systemPrompt',
   benchmarkResult: 'citadel.benchmarkResult',
 } as const;
 
@@ -46,6 +48,7 @@ const defaultSettings: CitadelAppSettings = {
   selectedModelId: DEFAULT_MODEL_ID,
   setupComplete: false,
   autoLoadModel: true,
+  systemPrompt: DEFAULT_ASSISTANT_SYSTEM_PROMPT,
 };
 
 function readBoolean(value: string | null, fallback: boolean): boolean {
@@ -249,10 +252,11 @@ export function CitadelProvider({ children }: { children: ReactNode }) {
     let mounted = true;
 
     async function bootstrapSettings() {
-      const [selectedModelId, setupCompleteRaw, autoLoadRaw, benchmarkRaw] = await Promise.all([
+      const [selectedModelId, setupCompleteRaw, autoLoadRaw, systemPromptRaw, benchmarkRaw] = await Promise.all([
         getSetting(SETTINGS_KEY.selectedModelId),
         getSetting(SETTINGS_KEY.setupComplete),
         getSetting(SETTINGS_KEY.autoLoadModel),
+        getSetting(SETTINGS_KEY.systemPrompt),
         getSetting(SETTINGS_KEY.benchmarkResult),
       ]);
 
@@ -264,6 +268,7 @@ export function CitadelProvider({ children }: { children: ReactNode }) {
         selectedModelId: selectedModelId ?? defaultSettings.selectedModelId,
         setupComplete: readBoolean(setupCompleteRaw, defaultSettings.setupComplete),
         autoLoadModel: readBoolean(autoLoadRaw, defaultSettings.autoLoadModel),
+        systemPrompt: systemPromptRaw?.trim() ? systemPromptRaw : defaultSettings.systemPrompt,
       });
 
       if (benchmarkRaw) {
@@ -455,12 +460,17 @@ export function CitadelProvider({ children }: { children: ReactNode }) {
   };
 
   const saveSettings = async (partial: Partial<CitadelAppSettings>): Promise<void> => {
-    const next = { ...appSettings, ...partial };
+    const next: CitadelAppSettings = {
+      ...appSettings,
+      ...partial,
+      systemPrompt: (partial.systemPrompt ?? appSettings.systemPrompt).trim() || DEFAULT_ASSISTANT_SYSTEM_PROMPT,
+    };
 
     await Promise.all([
       saveSetting(SETTINGS_KEY.selectedModelId, next.selectedModelId),
       saveSetting(SETTINGS_KEY.setupComplete, String(next.setupComplete)),
       saveSetting(SETTINGS_KEY.autoLoadModel, String(next.autoLoadModel)),
+      saveSetting(SETTINGS_KEY.systemPrompt, next.systemPrompt),
     ]);
 
     setAppSettings(next);
@@ -559,13 +569,14 @@ export function CitadelProvider({ children }: { children: ReactNode }) {
     const ranking = input.useKnowledge ? rankKnowledgeDocuments(input.userMessage, packs, 4) : [];
     const contextBlock = input.useKnowledge ? buildKnowledgeContext(ranking) : 'Knowledge mode disabled by user.';
 
+    const baseSystemPrompt = appSettings.systemPrompt.trim() || DEFAULT_ASSISTANT_SYSTEM_PROMPT;
     const systemPrompt = [
+      baseSystemPrompt,
+      '',
+      'Additional runtime instructions:',
       'You are Citadel Chat, an offline-first resilience assistant.',
       'You provide practical, step-by-step, safety-aware guidance.',
       'Use only local context and the user prompt. If unknown, state uncertainty clearly.',
-      'Keep answers concise.',
-      'Always end every response with one final line in this exact format: Confidence: X%',
-      'X must be an integer from 0 to 100, where 100% means highest confidence in the answer.',
       '',
       'Local knowledge context:',
       contextBlock,

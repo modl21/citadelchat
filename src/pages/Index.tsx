@@ -14,16 +14,22 @@ import type { LucideIcon } from 'lucide-react';
 
 import { useSeoMeta } from '@unhead/react';
 
-import { useCitadel, type CitadelMessage } from '@/contexts/CitadelContext';
+import {
+  DEFAULT_ASSISTANT_SYSTEM_PROMPT,
+  useCitadel,
+  type CitadelMessage,
+} from '@/contexts/CitadelContext';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { toast } from '@/hooks/useToast';
 import { useTheme } from '@/hooks/useTheme';
 import { SetupWizard } from '@/components/SetupWizard';
+import { useIsMobile } from '@/hooks/useIsMobile';
 import { KNOWLEDGE_PACKS } from '@/lib/knowledge-packs';
-import { formatBytes } from '@/lib/webllm-models';
+import { filterModelsForDevice, formatBytes } from '@/lib/webllm-models';
 
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import {
   AlertDialog,
@@ -45,7 +51,7 @@ type BeforeInstallPromptEvent = Event & {
 const INITIAL_MESSAGE: CitadelMessage = {
   id: 'welcome',
   role: 'assistant',
-  content: 'Citadel Chat is online locally. Ask anything from your downloaded packs or run general local AI chat.',
+  content: 'you are offline but have full knowledge pack access, ask anything to get started',
   createdAt: Date.now(),
 };
 
@@ -136,6 +142,7 @@ export default function Index() {
   } = useCitadel();
 
   const { theme, setTheme } = useTheme();
+  const isMobile = useIsMobile();
 
   const [setupCompletedState, setSetupCompletedState] = useState(appSettings.setupComplete);
   const [view, setView] = useState<AppView>('chat');
@@ -144,6 +151,8 @@ export default function Index() {
   const [prompt, setPrompt] = useState('');
   const [isSending, setIsSending] = useState(false);
   const [useKnowledge, setUseKnowledge] = useState(true);
+  const [systemPromptDraft, setSystemPromptDraft] = useState(appSettings.systemPrompt);
+  const [isSavingSystemPrompt, setIsSavingSystemPrompt] = useState(false);
 
   const [chatHistory, setChatHistory] = useLocalStorage<SavedChatSession[]>('citadel:chat-history', []);
   const [activeChatId, setActiveChatId] = useState<string | null>(null);
@@ -167,6 +176,10 @@ export default function Index() {
   useEffect(() => {
     setSetupCompletedState(appSettings.setupComplete);
   }, [appSettings.setupComplete]);
+
+  useEffect(() => {
+    setSystemPromptDraft(appSettings.systemPrompt);
+  }, [appSettings.systemPrompt]);
 
   useEffect(() => {
     const node = composerRef.current;
@@ -252,6 +265,16 @@ export default function Index() {
     () => availablePacks.filter(pack => pack.recommended),
     [availablePacks],
   );
+
+  const modelsToOffer = useMemo(
+    () => filterModelsForDevice(availableModels, isMobile),
+    [availableModels, isMobile],
+  );
+
+  const normalizedSystemPromptDraft = systemPromptDraft.trim();
+  const normalizedSavedSystemPrompt = appSettings.systemPrompt.trim();
+  const hasSystemPromptChanges = normalizedSystemPromptDraft !== normalizedSavedSystemPrompt;
+  const canSaveSystemPrompt = normalizedSystemPromptDraft.length > 0 && hasSystemPromptChanges;
 
   if (!setupIsComplete) {
     return <SetupWizard onComplete={() => setSetupCompletedState(true)} />;
@@ -556,14 +579,51 @@ export default function Index() {
               </section>
 
               <section className="space-y-4">
+                <h2 className="text-sm font-semibold">assistant behavior</h2>
+                <p className="text-xs text-muted-foreground">
+                  This system prompt is applied to all loaded models.
+                </p>
+                <div className="space-y-3 border-y border-border/70 py-4">
+                  <Textarea
+                    value={systemPromptDraft}
+                    onChange={(event) => setSystemPromptDraft(event.target.value)}
+                    className="min-h-[168px] text-sm leading-6"
+                    aria-label="System prompt"
+                  />
+                  <div className="flex flex-wrap items-center gap-2">
+                    <Button
+                      size="sm"
+                      disabled={!canSaveSystemPrompt || isSavingSystemPrompt}
+                      onClick={() => {
+                        void handleSaveSystemPrompt();
+                      }}
+                    >
+                      {isSavingSystemPrompt ? 'saving…' : 'save prompt'}
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      disabled={isSavingSystemPrompt || systemPromptDraft === DEFAULT_ASSISTANT_SYSTEM_PROMPT}
+                      onClick={() => setSystemPromptDraft(DEFAULT_ASSISTANT_SYSTEM_PROMPT)}
+                    >
+                      reset to default
+                    </Button>
+                  </div>
+                </div>
+              </section>
+
+              <section className="space-y-4">
                 <h2 className="text-sm font-semibold">models</h2>
                 <p className="text-xs text-muted-foreground">
                   {runtimeCompatibility.headline}. {runtimeCompatibility.detail}
                 </p>
+                {isMobile && (
+                  <p className="text-xs text-muted-foreground">more powerful models available on desktop</p>
+                )}
                 {engineError && <p className="text-xs text-destructive">{engineError}</p>}
 
                 <ul className="divide-y divide-border/70 border-y border-border/70">
-                  {availableModels.map(model => {
+                  {modelsToOffer.map(model => {
                     const active = model.id === (currentModelId ?? appSettings.selectedModelId);
                     const cached = cachedModelStatus[model.id];
 
@@ -865,6 +925,31 @@ export default function Index() {
       });
     } finally {
       setIsRefreshingOfflineCache(false);
+    }
+  }
+
+  async function handleSaveSystemPrompt() {
+    if (!normalizedSystemPromptDraft || isSavingSystemPrompt || !hasSystemPromptChanges) {
+      return;
+    }
+
+    setIsSavingSystemPrompt(true);
+
+    try {
+      await saveSettings({ systemPrompt: normalizedSystemPromptDraft });
+      toast({
+        title: 'Prompt saved',
+        description: 'System prompt updated for all models.',
+      });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to save system prompt.';
+      toast({
+        title: 'Save failed',
+        description: message,
+        variant: 'destructive',
+      });
+    } finally {
+      setIsSavingSystemPrompt(false);
     }
   }
 
